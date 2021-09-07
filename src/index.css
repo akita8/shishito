@@ -1,0 +1,13 @@
+@import "normalize.css";
+@import "sanitize.css";
+
+.PageLoader {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+body {
+  background-color: #f0f6f8;
+}

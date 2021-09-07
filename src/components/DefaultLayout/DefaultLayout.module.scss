@@ -1,0 +1,36 @@
+.DefaultLayout {
+  min-width: 100vw;
+  min-height: 100vh;
+  display: grid;
+  grid-template: auto 1fr / 1fr 24fr 1fr;
+  .TopBar {
+    grid-column: 1/4;
+    padding: 0 2rem;
+    background-color: #6c7677;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    a {
+      color: white;
+      text-decoration: none;
+    }
+    span {
+      font-size: 1.2rem;
+      text-transform: capitalize;
+    }
+    h1 {
+      cursor: pointer;
+    }
+  }
+  .LeftBar {
+    grid-column: 1/2;
+  }
+  main {
+    grid-column: 2/3;
+    padding: 3rem 3rem 1rem 3rem;
+  }
+  .RightBar {
+    grid-column: 3/4;
+  }
+}

@@ -1,0 +1,20 @@
+.Input {
+  display: flex;
+  flex-direction: column;
+  .InputGroup {
+    display: flex;
+    flex-direction: column;
+    input {
+      padding: 0.7rem;
+      border: 1px solid;
+      font-size: 1rem;
+      border-radius: 0.2rem;
+      border-color: rgb(172, 172, 172);
+    }
+    .Hint {
+      color: #f32013;
+      font-size: 0.8rem;
+      margin-top: 0.4rem;
+    }
+  }
+}

@@ -1,0 +1,35 @@
+.TradedAssetsPage {
+  .StockData {
+    list-style-type: none;
+  }
+  .Summary {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    .OwnerSummary {
+      width: 85%;
+      padding: 1rem;
+      gap: 2rem;
+      margin-bottom: 1.5rem;
+      span {
+        font-size: 1.2rem;
+      }
+      span:first-child {
+        font-size: 1.7rem;
+      }
+    }
+    .AddTransactionButton {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      margin-bottom: 2rem;
+      .Icon {
+        margin-left: 0.5rem;
+        height: 1rem;
+        width: 1rem;
+      }
+    }
+  }
+}

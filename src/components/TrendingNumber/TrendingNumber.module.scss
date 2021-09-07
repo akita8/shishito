@@ -1,0 +1,18 @@
+.TrendingNumber {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  .Value {
+    margin-right: 0.4rem;
+  }
+  .Icon {
+    height: 1.2rem;
+    width: 1.2rem;
+  }
+}
+.Positive {
+  color: #4bb543;
+}
+.Negative {
+  color: #f32013;
+}

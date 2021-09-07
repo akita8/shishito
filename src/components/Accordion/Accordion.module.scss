@@ -1,0 +1,38 @@
+.ExpandableRow {
+  margin-bottom: 2rem;
+  .TitleCard {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+
+    h3 {
+      margin: 0;
+    }
+
+    .IconWrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: black;
+      border-radius: 2rem;
+      .Icon {
+        color: white;
+        height: 2rem;
+        width: 2rem;
+      }
+    }
+  }
+  .ExpandedCard {
+    padding: 1.5rem;
+  }
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+  list-style-position: inside;
+  list-style-type: none;
+}

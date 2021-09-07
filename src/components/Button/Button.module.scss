@@ -1,0 +1,15 @@
+.Button {
+  width: fit-content;
+  padding: 0.8rem 2rem;
+  border: 1px solid;
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  border-radius: 1rem;
+  text-transform: capitalize;
+  background-color: #7f8c8e;
+}
+
+button:disabled {
+  background-color: #b5c5c9;
+}
