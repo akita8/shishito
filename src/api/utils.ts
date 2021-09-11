@@ -5,3 +5,14 @@ export const prepareAuthHeader = (
 ): Record<string, string> => ({
   Authorization: `${token.tokenType} ${token.accessToken}`,
 });
+
+export const strictFetch = async (
+  input: RequestInfo,
+  init?: RequestInit
+): Promise<Response> => {
+  const response = await fetch(input, init);
+  if (!response.ok) {
+    throw new Error(`fetch call to ${input} failed`);
+  }
+  return response;
+};

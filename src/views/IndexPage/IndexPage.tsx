@@ -23,13 +23,7 @@ const IndexPage = ({ accounts }: IndexPageProps) => {
             {a.owners.map((o) => (
               <Button
                 key={o.ownerId}
-                onClick={() =>
-                  history.push(`/traded/${o.ownerId}`, {
-                    ownerName: o.name,
-                    bank: a.bankName,
-                    accountNumber: a.accountNumber,
-                  })
-                }
+                onClick={() => history.push(`/traded/${o.ownerId}`)}
               >
                 {o.name}
               </Button>

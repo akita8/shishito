@@ -2,6 +2,17 @@
   .StockData {
     list-style-type: none;
   }
+  .AccordionTitle {
+    display: flex;
+    flex-direction: row;
+    .TitleText {
+      margin-right: 2rem;
+    }
+  }
+  .ProfitAndLoss {
+    font-size: 1rem;
+    font-weight: 400;
+  }
   .Summary {
     display: flex;
     flex-direction: row;

@@ -9,6 +9,7 @@ interface InputProps {
   onKeyPress?: (key: string) => void;
   hint?: string;
   min?: string;
+  placeholder?: string;
   className?: string;
 }
 
@@ -17,6 +18,7 @@ export const Input = ({
   name,
   label,
   hint,
+  placeholder,
   onChange,
   onKeyPress,
   className,
@@ -25,6 +27,7 @@ export const Input = ({
     {label && <label htmlFor={name}>{label}</label>}
     <span className={style.InputGroup}>
       <input
+        placeholder={placeholder}
         type={inputType}
         name={name}
         onChange={(e) => onChange(e.target.value)}

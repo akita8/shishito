@@ -6,13 +6,13 @@ import {
   TradedStocksResponse,
   UserToken,
 } from "./types";
-import { prepareAuthHeader } from "./utils";
+import { prepareAuthHeader, strictFetch } from "./utils";
 
 export const fetchTradedStocks = async (
   token: UserToken,
   ownerID: number
 ): Promise<TradedStocks> => {
-  const response = await fetch(`/stock/traded/${ownerID}`, {
+  const response = await fetch(`/stock/traded/${ownerID}/`, {
     headers: {
       accept: "application/json",
       ...prepareAuthHeader(token),
@@ -42,7 +42,7 @@ export const fetchOrCreateStock = async (
   token: UserToken,
   symbol: string
 ): Promise<Stock> => {
-  const response = await fetch("/stock/", {
+  const response = await strictFetch("/stock/", {
     method: "PUT",
     headers: {
       accept: "application/json",

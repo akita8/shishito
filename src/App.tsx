@@ -21,6 +21,7 @@ function App() {
   const [authToken, setAuthToken] = useState<UserToken | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [accounts, setAccount] = useState<BankAccount[] | null>(null);
+  const [failedAuth, setFailedAuth] = useState<boolean>(false);
 
   const history = useHistory();
 
@@ -55,9 +56,15 @@ function App() {
           <Route exact path="/login">
             <LoginPage
               onLogin={async (username, password) => {
-                const token = await authenticateUser(username, password);
-                setAuthToken(token);
+                try {
+                  const token = await authenticateUser(username, password);
+                  setAuthToken(token);
+                  setFailedAuth(false);
+                } catch (error) {
+                  setFailedAuth(true);
+                }
               }}
+              failedAuth={failedAuth}
             />
           </Route>
           <Route exact path="/traded/:ownerId">

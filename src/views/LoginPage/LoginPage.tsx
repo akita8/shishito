@@ -7,9 +7,10 @@ import style from "./LoginPage.module.scss";
 
 interface LoginPageProps {
   onLogin: (username: string, password: string) => void;
+  failedAuth: boolean;
 }
 
-const LoginPage = ({ onLogin }: LoginPageProps) => {
+const LoginPage = ({ onLogin, failedAuth }: LoginPageProps) => {
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
@@ -43,6 +44,7 @@ const LoginPage = ({ onLogin }: LoginPageProps) => {
           onChange={setPassword}
           onKeyPress={handleEnterKeyPress}
           label="Password:"
+          hint={failedAuth ? "Invalid login credentials" : undefined}
         />
         <Button
           disabled={isInvalid}

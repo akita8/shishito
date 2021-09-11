@@ -24,6 +24,7 @@ const AddStockTransactionPage = ({
 
   const [symbol, setSymbol] = useState("");
   const [stock, setStock] = useState<Stock | null>(null);
+  const [stockHint, setStockHint] = useState<string>("");
   const [priceHint, setPriceHint] = useState<string>("");
   const [quantityHint, setQuantityHint] = useState<string>("");
   const [taxHint, setTaxHint] = useState<string>("");
@@ -38,7 +39,15 @@ const AddStockTransactionPage = ({
   const [note, setNote] = useState<string | null>(null);
 
   const onSearch = useCallback(() => {
-    void (async () => setStock(await fetchOrCreateStock(authToken, symbol)))();
+    void (async () => {
+      try {
+        const stockResponse = await fetchOrCreateStock(authToken, symbol);
+        setStock(stockResponse);
+        setStockHint("");
+      } catch (error) {
+        setStockHint(`Could not find symbol: ${symbol}`);
+      }
+    })();
   }, [authToken, symbol]);
 
   const handleEnterKeyPress = useCallback(
@@ -112,11 +121,12 @@ const AddStockTransactionPage = ({
       <section className={style.StockSearch}>
         <Input
           className={style.Input}
-          label="Stock symbol: "
+          placeholder="Stock Symbol"
           inputType="text"
           name="symbol"
           onChange={setSymbol}
           onKeyPress={handleEnterKeyPress}
+          hint={stockHint}
         />
         <Button onClick={onSearch}>Search</Button>
       </section>
@@ -234,12 +244,12 @@ const AddStockTransactionPage = ({
               disabled={confirmedDisabled}
               onClick={async () => {
                 if (
-                  price &&
-                  quantity &&
-                  tax &&
-                  commission &&
-                  date &&
-                  transactionType
+                  price !== null &&
+                  quantity !== null &&
+                  tax !== null &&
+                  commission !== null &&
+                  date !== null &&
+                  transactionType !== null
                 ) {
                   await createStockTransaction(authToken, Number(ownerId), {
                     stock_id: stock.stockId,
@@ -251,8 +261,7 @@ const AddStockTransactionPage = ({
                     transaction_type: transactionType,
                     transaction_note: note,
                   });
-                  //FIXME navigated to transactions history when implemented
-                  history.push(`/`);
+                  history.push(`/traded/${ownerId}`);
                 }
               }}
             >

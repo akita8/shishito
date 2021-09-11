@@ -1,4 +1,10 @@
-import { BankAccount, AccountsResponse, UserToken } from "./types";
+import {
+  BankAccount,
+  AccountsResponse,
+  UserToken,
+  OwnerDetailsResponse,
+  OwnerDetails,
+} from "./types";
 import { prepareAuthHeader } from "./utils";
 
 export const fetchAccounts = async (
@@ -18,4 +24,23 @@ export const fetchAccounts = async (
     bankName: a.bank_name,
     owners: a.owners.map((o) => ({ ownerId: o.owner_id, name: o.name })),
   }));
+};
+
+export const fetchOwner = async (
+  token: UserToken,
+  ownerId: number
+): Promise<OwnerDetails> => {
+  const response = await fetch(`/account/owner/${ownerId}`, {
+    headers: {
+      accept: "application/json",
+      ...prepareAuthHeader(token),
+    },
+  });
+  const data: OwnerDetailsResponse = await response.json();
+  return {
+    name: data.name,
+    ownerId: data.owner_id,
+    bankName: data.bank_name,
+    accountNumber: data.account_number,
+  };
 };

@@ -8,7 +8,7 @@ import style from "./Accordion.module.scss";
 
 interface ExpandableRowProps {
   id?: number;
-  title: string;
+  title: string | JSX.Element;
   component: JSX.Element;
 }
 

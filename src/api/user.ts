@@ -1,5 +1,5 @@
 import { User, UserResponse, UserToken, UserTokenResponse } from "./types";
-import { prepareAuthHeader } from "./utils";
+import { prepareAuthHeader, strictFetch } from "./utils";
 
 export const fetchUser = async (token: UserToken): Promise<User> => {
   const response = await fetch("/user/me/", {
@@ -20,7 +20,7 @@ export const authenticateUser = async (
   username: string,
   password: string
 ): Promise<UserToken> => {
-  const response = await fetch("/user/token/", {
+  const response = await strictFetch("/user/token/", {
     method: "POST",
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",

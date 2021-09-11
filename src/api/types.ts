@@ -116,3 +116,15 @@ export interface NewStockTransactionPayload {
   transaction_type: string;
   transaction_note: string | null;
 }
+
+export interface OwnerDetailsResponse {
+  owner_id: number;
+  name: string;
+  bank_name: string;
+  account_number: string;
+}
+
+export interface OwnerDetails extends Owner {
+  bankName: string;
+  accountNumber: string;
+}
