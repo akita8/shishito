@@ -17,6 +17,11 @@ const AddStockTransactionPage = lazy(
   () => import("./views/AddStockTransactionPage/AddStockTransactionPage")
 );
 
+const StockTransactionHistoryPage = lazy(
+  () =>
+    import("./views/StockTransactionHistoryPage/StockTransactionHistoryPage")
+);
+
 function App() {
   const [authToken, setAuthToken] = useState<UserToken | null>(null);
   const [user, setUser] = useState<User | null>(null);
@@ -75,8 +80,11 @@ function App() {
               />
             )}
           </Route>
-          <Route exact path="/transaction/stock/:ownerId">
+          <Route exact path="/transaction/:ownerId/stock">
             {authToken && <AddStockTransactionPage authToken={authToken} />}
+          </Route>
+          <Route exact path="/transaction/:ownerId/stock/:stockId">
+            {authToken && <StockTransactionHistoryPage authToken={authToken} />}
           </Route>
         </Suspense>
       </DefaultLayout>

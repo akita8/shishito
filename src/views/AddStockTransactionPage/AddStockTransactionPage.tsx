@@ -26,11 +26,13 @@ const AddStockTransactionPage = ({
   const [stock, setStock] = useState<Stock | null>(null);
   const [stockHint, setStockHint] = useState<string>("");
   const [priceHint, setPriceHint] = useState<string>("");
+  const [exRateHint, setExRateHint] = useState<string>("");
   const [quantityHint, setQuantityHint] = useState<string>("");
   const [taxHint, setTaxHint] = useState<string>("");
   const [commissionHint, setCommissionHint] = useState<string>("");
 
   const [price, setPrice] = useState<number | null>(null);
+  const [exRate, setExRate] = useState<number | null>(null);
   const [quantity, setQuantity] = useState<number | null>(null);
   const [tax, setTax] = useState<number | null>(null);
   const [commission, setCommission] = useState<number | null>(null);
@@ -101,7 +103,8 @@ const AddStockTransactionPage = ({
       priceHint !== "" ||
       quantityHint !== "" ||
       taxHint !== "" ||
-      commissionHint !== ""
+      commissionHint !== "" ||
+      exRateHint !== ""
     );
   }, [
     commission,
@@ -114,6 +117,7 @@ const AddStockTransactionPage = ({
     tax,
     taxHint,
     transactionType,
+    exRateHint,
   ]);
 
   return (
@@ -151,6 +155,23 @@ const AddStockTransactionPage = ({
               }
             }}
             hint={priceHint}
+          />
+          <Input
+            className={classnames(style.Input, style.Parameter, style.Mobile)}
+            label="Exchange Rate: "
+            inputType="text"
+            name="exchange_rate"
+            onChange={(v) => {
+              const num = parseDecimal(v);
+              if (isNaN(num) || num < 0) {
+                setExRateHint("Exchange rate must be a positive number");
+                setExRate(null);
+              } else {
+                setExRateHint("");
+                setExRate(num);
+              }
+            }}
+            hint={exRateHint}
           />
           <Input
             className={classnames(style.Input, style.Parameter, style.Mobile)}
@@ -260,6 +281,7 @@ const AddStockTransactionPage = ({
                     date: `${date}T12:00:00.000000`,
                     transaction_type: transactionType,
                     transaction_note: note,
+                    transaction_ex_rate: exRate,
                   });
                   history.push(`/traded/${ownerId}`);
                 }

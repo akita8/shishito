@@ -115,6 +115,7 @@ export interface NewStockTransactionPayload {
   date: string;
   transaction_type: string;
   transaction_note: string | null;
+  transaction_ex_rate: number | null;
 }
 
 export interface OwnerDetailsResponse {

@@ -2,16 +2,20 @@
   .StockData {
     list-style-type: none;
   }
-  .AccordionTitle {
+  .Info {
     display: flex;
     flex-direction: row;
-    .TitleText {
+    align-items: center;
+    .Title {
       margin-right: 2rem;
     }
-  }
-  .ProfitAndLoss {
-    font-size: 1rem;
-    font-weight: 400;
+    .ProfitAndLoss {
+      font-size: 1rem;
+      font-weight: 400;
+      @media only screen and (max-width: 600px) {
+        visibility: hidden;
+      }
+    }
   }
   .Summary {
     display: flex;
@@ -22,13 +26,13 @@
     .OwnerSummary {
       width: 85%;
       padding: 1rem;
-      gap: 2rem;
-      margin-bottom: 1.5rem;
+      gap: 1rem;
+      margin-bottom: 1rem;
       span {
-        font-size: 1.2rem;
+        font-size: 1rem;
       }
       span:first-child {
-        font-size: 1.7rem;
+        font-size: 1.5rem;
       }
     }
     .AddTransactionButton {
@@ -36,7 +40,7 @@
       flex-direction: row;
       align-items: center;
       margin-bottom: 2rem;
-      .Icon {
+      .AddIcon {
         margin-left: 0.5rem;
         height: 1rem;
         width: 1rem;

@@ -4,7 +4,7 @@ import { fetchOwner } from "../../api/account";
 
 import { fetchTradedStocks } from "../../api/stocks";
 import { OwnerDetails, TradedStocks, UserToken } from "../../api/types";
-import { Accordion } from "../../components/Accordion";
+import { Accordion, ExpandableRowProps } from "../../components/Accordion";
 import { Button } from "../../components/Button";
 import { GridCell, GridList } from "../../components/GridList";
 import { TrendingNumber } from "../../components/TrendingNumber";
@@ -26,7 +26,7 @@ const TradedAssetsPage = ({
   const [tradedStocks, setTradedStocks] = useState<TradedStocks | null>(null);
   const [owner, setOwner] = useState<OwnerDetails | null>(null);
 
-  const rows = useMemo(() => {
+  const rows = useMemo<ExpandableRowProps[]>(() => {
     if (tradedStocks) {
       const sortedStocks = [...tradedStocks.stocks].sort((a, b) =>
         a.symbol.localeCompare(b.symbol)
@@ -55,13 +55,15 @@ const TradedAssetsPage = ({
         return {
           id: s.stockId,
           title: (
-            <span className={style.AccordionTitle}>
-              <span className={style.TitleText}>
+            <span className={style.Info}>
+              <span className={style.Title}>
                 {`${s.symbol} - ${currency} - ${s.market}`}
               </span>
               {profitAndLoss}
             </span>
           ),
+          onMoreInfo: () =>
+            history.push(`/transaction/${ownerId}/stock/${s.stockId}`),
           component: (
             <GridList
               cells={[
@@ -103,7 +105,7 @@ const TradedAssetsPage = ({
         };
       });
     } else return [];
-  }, [tradedStocks, baseCurrency]);
+  }, [tradedStocks, baseCurrency, history, ownerId]);
 
   const infoCells = useMemo<GridCell[]>(
     () =>
@@ -149,10 +151,10 @@ const TradedAssetsPage = ({
         <GridList className={style.OwnerSummary} cells={infoCells} />
         <Button
           className={style.AddTransactionButton}
-          onClick={() => history.push(`/transaction/stock/${ownerId}`)}
+          onClick={() => history.push(`/transaction/${ownerId}/stock`)}
         >
           <span>Add Transaction</span>
-          <Plus className={style.Icon} />
+          <Plus className={style.AddIcon} />
         </Button>
       </section>
       {tradedStocks && <Accordion rows={rows} />}
