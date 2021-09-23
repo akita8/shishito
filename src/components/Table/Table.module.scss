@@ -1,0 +1,50 @@
+.Table {
+  width: 100%;
+  thead {
+    text-align: left;
+    th {
+      padding: 1rem 0;
+      color: white;
+      background-color: #6c7677;
+    }
+    th:first-child {
+      padding-left: 1rem;
+      border-top-left-radius: 0.5rem;
+    }
+    th:last-child {
+      padding-right: 1rem;
+      border-top-right-radius: 0.5rem;
+    }
+  }
+  tbody {
+    td {
+      padding: 1rem 0;
+    }
+    td:first-child {
+      padding-left: 1rem;
+    }
+    td:last-child {
+      padding-right: 1rem;
+    }
+    tr:nth-child(odd) td {
+      background-color: white;
+    }
+    tr:nth-child(even) td {
+      background-color: #e9e9e9;
+    }
+    tr:last-child {
+      td:first-child {
+        border-bottom-left-radius: 0.5rem;
+      }
+      td:last-child {
+        border-bottom-right-radius: 0.5rem;
+      }
+    }
+  }
+  .Selected {
+    td {
+      background-color: #575656 !important;
+      color: white;
+    }
+  }
+}

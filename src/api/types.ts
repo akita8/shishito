@@ -129,3 +129,24 @@ export interface OwnerDetails extends Owner {
   bankName: string;
   accountNumber: string;
 }
+
+export interface StockTransactionResponse extends NewStockTransactionPayload {
+  stock_transaction_id: number;
+}
+
+export interface StockTransactionsResponse {
+  transactions: StockTransactionResponse[];
+}
+
+export interface StockTransaction {
+  stockTransactionId: number;
+  stockId: number;
+  price: number;
+  quantity: number;
+  tax: number;
+  commission: number;
+  date: string;
+  transactionType: string;
+  transactionNote: string | null;
+  transactionExRate: number | null;
+}

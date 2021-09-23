@@ -2,6 +2,8 @@ import {
   NewStockTransactionPayload,
   Stock,
   StockResponse,
+  StockTransactionsResponse,
+  StockTransaction,
   TradedStocks,
   TradedStocksResponse,
   UserToken,
@@ -77,4 +79,33 @@ export const createStockTransaction = async (
     },
     body: JSON.stringify(payload),
   });
+};
+
+export const fetchStockTransactions = async (
+  token: UserToken,
+  ownerID: number,
+  stockID: number
+): Promise<StockTransaction[]> => {
+  const response = await fetch(
+    `/stock/transaction/${ownerID}/history/${stockID}`,
+    {
+      headers: {
+        accept: "application/json",
+        ...prepareAuthHeader(token),
+      },
+    }
+  );
+  const data: StockTransactionsResponse = await response.json();
+  return data.transactions.map((t) => ({
+    stockTransactionId: t.stock_transaction_id,
+    stockId: t.stock_id,
+    price: t.price,
+    quantity: t.quantity,
+    tax: t.tax,
+    commission: t.commission,
+    date: t.date,
+    transactionType: t.transaction_type,
+    transactionNote: t.transaction_note,
+    transactionExRate: t.transaction_ex_rate,
+  }));
 };
