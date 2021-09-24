@@ -7,6 +7,8 @@ import {
   TradedStocks,
   TradedStocksResponse,
   UserToken,
+  TradedStock,
+  TradedStockResponse,
 } from "./types";
 import { prepareAuthHeader, strictFetch } from "./utils";
 
@@ -26,7 +28,7 @@ export const fetchTradedStocks = async (
       stockId: s.stock_id,
       symbol: s.symbol,
       market: s.market,
-      currency: s.currency,
+      isoCurrency: s.iso_currency,
       lastPrice: s.last_price,
       currentCtvConverted: s.current_ctv_converted,
       fiscalPrice: s.fiscal_price,
@@ -37,6 +39,34 @@ export const fetchTradedStocks = async (
       shortName: s.short_name,
     })),
     currentCtvConverted: data.current_ctv_converted,
+  };
+};
+
+export const fetchTradedStock = async (
+  token: UserToken,
+  ownerID: number,
+  stockID: number
+): Promise<TradedStock> => {
+  const response = await fetch(`/stock/traded/${ownerID}/${stockID}`, {
+    headers: {
+      accept: "application/json",
+      ...prepareAuthHeader(token),
+    },
+  });
+  const data: TradedStockResponse = await response.json();
+  return {
+    stockId: data.stock_id,
+    symbol: data.symbol,
+    market: data.market,
+    isoCurrency: data.iso_currency,
+    lastPrice: data.last_price,
+    currentCtvConverted: data.current_ctv_converted,
+    fiscalPrice: data.fiscal_price,
+    profitAndLoss: data.profit_and_loss,
+    currentQuantity: data.current_quantity,
+    invested: data.invested,
+    currentCtv: data.current_ctv,
+    shortName: data.short_name,
   };
 };
 

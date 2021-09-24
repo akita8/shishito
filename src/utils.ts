@@ -1,2 +1,1 @@
-export const parseDecimal = (n: string): number =>
-  parseFloat(n.replace(",", "."));
+export const parseDecimal = (n: string): number => Number(n.replace(",", "."));

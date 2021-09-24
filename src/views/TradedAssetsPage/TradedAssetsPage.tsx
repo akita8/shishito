@@ -32,7 +32,7 @@ const TradedAssetsPage = ({
         a.symbol.localeCompare(b.symbol)
       );
       return sortedStocks.map((s) => {
-        const currency = s.currency.toUpperCase();
+        const currency = s.isoCurrency.toUpperCase();
         const lang = navigator.language;
         const baseFormatter = new Intl.NumberFormat(lang, {
           style: "currency",
@@ -151,7 +151,7 @@ const TradedAssetsPage = ({
         <GridList className={style.OwnerSummary} cells={infoCells} />
         <Button
           className={style.AddTransactionButton}
-          onClick={() => history.push(`/transaction/${ownerId}/stock`)}
+          onClick={() => history.push(`/transaction/${ownerId}/add/stock`)}
         >
           <span>Add Transaction</span>
           <Plus className={style.AddIcon} />

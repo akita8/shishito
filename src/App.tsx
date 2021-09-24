@@ -80,7 +80,7 @@ function App() {
               />
             )}
           </Route>
-          <Route exact path="/transaction/:ownerId/stock">
+          <Route path="/transaction/:ownerId/:action/stock/:stockId?">
             {authToken && <AddStockTransactionPage authToken={authToken} />}
           </Route>
           <Route exact path="/transaction/:ownerId/stock/:stockId">

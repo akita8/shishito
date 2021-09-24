@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import { useState } from "react";
 import style from "./Input.module.scss";
 
 interface InputProps {
@@ -11,6 +12,7 @@ interface InputProps {
   min?: string;
   placeholder?: string;
   className?: string;
+  value?: string | number;
 }
 
 export const Input = ({
@@ -19,21 +21,29 @@ export const Input = ({
   label,
   hint,
   placeholder,
+  value,
   onChange,
   onKeyPress,
   className,
-}: InputProps) => (
-  <span className={classNames(style.Input, className)}>
-    {label && <label htmlFor={name}>{label}</label>}
-    <span className={style.InputGroup}>
-      <input
-        placeholder={placeholder}
-        type={inputType}
-        name={name}
-        onChange={(e) => onChange(e.target.value)}
-        onKeyPress={(e) => onKeyPress && onKeyPress(e.key)}
-      />
-      {hint && <span className={style.Hint}>{hint}</span>}
+}: InputProps) => {
+  const [innerValue, setInnerValue] = useState(value);
+  return (
+    <span className={classNames(style.Input, className)}>
+      {label && <label htmlFor={name}>{label}</label>}
+      <span className={style.InputGroup}>
+        <input
+          value={innerValue}
+          placeholder={placeholder}
+          type={inputType}
+          name={name}
+          onChange={(e) => {
+            setInnerValue(e.target.value);
+            onChange(e.target.value);
+          }}
+          onKeyPress={(e) => onKeyPress && onKeyPress(e.key)}
+        />
+        {hint && <span className={style.Hint}>{hint}</span>}
+      </span>
     </span>
-  </span>
-);
+  );
+};

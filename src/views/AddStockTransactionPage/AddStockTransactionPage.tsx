@@ -1,10 +1,19 @@
-import { useCallback, useMemo, useState } from "react";
-import { useHistory, useParams } from "react-router";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useHistory, /*useLocation,*/ useParams } from "react-router";
 import classnames from "classnames";
 import Select from "react-select";
 
-import { createStockTransaction, fetchOrCreateStock } from "../../api/stocks";
-import { Stock, UserToken } from "../../api/types";
+import {
+  createStockTransaction,
+  fetchOrCreateStock,
+  fetchTradedStock,
+} from "../../api/stocks";
+import {
+  Stock,
+  //StockTransaction,
+  TradedStock,
+  UserToken,
+} from "../../api/types";
 import { Button } from "../../components/Button";
 import { GridCell, GridList } from "../../components/GridList";
 import { Input } from "../../components/Input";
@@ -16,14 +25,25 @@ interface AddStockTransactionPageProps {
   authToken: UserToken;
 }
 
+enum Actions {
+  ADD = "add",
+  MODIFY = "modify",
+}
+
 const AddStockTransactionPage = ({
   authToken,
 }: AddStockTransactionPageProps) => {
-  const { ownerId } = useParams<{ ownerId: string }>();
+  const { ownerId, stockId } =
+    useParams<{
+      ownerId: string;
+      stockId: string | undefined;
+      action: Actions;
+    }>();
   const history = useHistory();
+  //const { state } = useLocation<{ transaction: StockTransaction }>();
 
   const [symbol, setSymbol] = useState("");
-  const [stock, setStock] = useState<Stock | null>(null);
+  const [stock, setStock] = useState<Stock | TradedStock | null>(null);
   const [stockHint, setStockHint] = useState<string>("");
   const [priceHint, setPriceHint] = useState<string>("");
   const [exRateHint, setExRateHint] = useState<string>("");
@@ -39,6 +59,16 @@ const AddStockTransactionPage = ({
   const [date, setDate] = useState<string | null>(null);
   const [transactionType, setTransactionType] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+      if (stockId) {
+        setStock(
+          await fetchTradedStock(authToken, Number(ownerId), Number(stockId))
+        );
+      }
+    })();
+  }, [authToken, stockId, ownerId]);
 
   const onSearch = useCallback(() => {
     void (async () => {
@@ -122,18 +152,20 @@ const AddStockTransactionPage = ({
 
   return (
     <div className={style.AddStockTransactionPage}>
-      <section className={style.StockSearch}>
-        <Input
-          className={style.Input}
-          placeholder="Stock Symbol"
-          inputType="text"
-          name="symbol"
-          onChange={setSymbol}
-          onKeyPress={handleEnterKeyPress}
-          hint={stockHint}
-        />
-        <Button onClick={onSearch}>Search</Button>
-      </section>
+      {!stockId && (
+        <section className={style.StockSearch}>
+          <Input
+            className={style.Input}
+            placeholder="Stock Symbol"
+            inputType="text"
+            name="symbol"
+            onChange={setSymbol}
+            onKeyPress={handleEnterKeyPress}
+            hint={stockHint}
+          />
+          <Button onClick={onSearch}>Search</Button>
+        </section>
+      )}
       {stockCells.length > 0 && (
         <GridList className={style.StockGridList} cells={stockCells} />
       )}
@@ -283,7 +315,9 @@ const AddStockTransactionPage = ({
                     transaction_note: note,
                     transaction_ex_rate: exRate,
                   });
-                  history.push(`/traded/${ownerId}`);
+                  history.push(
+                    `/transaction/${ownerId}/stock/${stock.stockId}`
+                  );
                 }
               }}
             >

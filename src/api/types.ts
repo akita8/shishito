@@ -50,7 +50,7 @@ export interface TradedStockResponse {
   stock_id: number;
   symbol: string;
   market: string;
-  currency: string;
+  iso_currency: string;
   last_price: number;
   current_ctv_converted: number;
   fiscal_price: number;
@@ -70,7 +70,7 @@ export interface TradedStock {
   stockId: number;
   symbol: string;
   market: string;
-  currency: string;
+  isoCurrency: string;
   lastPrice: number;
   currentCtvConverted: number;
   fiscalPrice: number;
