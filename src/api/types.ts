@@ -150,3 +150,15 @@ export interface StockTransaction {
   transactionNote: string | null;
   transactionExRate: number | null;
 }
+
+export interface UpdateStockTransactionPayload {
+  stock_transaction_id: number;
+  price: number;
+  quantity: number;
+  tax: number;
+  commission: number;
+  date: string;
+  transaction_note: string | null;
+  transaction_ex_rate: number | null;
+}
+

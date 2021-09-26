@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import classnames from "classnames";
 
 import style from "./Table.module.scss";
@@ -31,6 +31,11 @@ export const Table = <T extends number | string | null>({
 }: TableProps<T>) => {
   const [selectedRows, setSelectedRows] = useState<Array<number>>([]);
   const [sortOrder, setSortOrder] = useState<SortOrder | null>(null);
+
+  useEffect(() => {
+    setSelectedRows([]);
+  }, [rows]);
+
   return (
     <table className={style.Table}>
       <thead>

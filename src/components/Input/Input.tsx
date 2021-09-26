@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import style from "./Input.module.scss";
 
 interface InputProps {
@@ -12,7 +12,7 @@ interface InputProps {
   min?: string;
   placeholder?: string;
   className?: string;
-  value?: string | number;
+  value?: string | number | null;
 }
 
 export const Input = ({
@@ -26,7 +26,13 @@ export const Input = ({
   onKeyPress,
   className,
 }: InputProps) => {
-  const [innerValue, setInnerValue] = useState(value);
+  const [innerValue, setInnerValue] = useState<string | number | undefined>();
+
+  useEffect(() => {
+    if (value === null) setInnerValue(undefined);
+    else setInnerValue(value);
+  }, [value]);
+
   return (
     <span className={classNames(style.Input, className)}>
       {label && <label htmlFor={name}>{label}</label>}

@@ -9,6 +9,7 @@ import {
   UserToken,
   TradedStock,
   TradedStockResponse,
+  UpdateStockTransactionPayload,
 } from "./types";
 import { prepareAuthHeader, strictFetch } from "./utils";
 
@@ -138,4 +139,34 @@ export const fetchStockTransactions = async (
     transactionNote: t.transaction_note,
     transactionExRate: t.transaction_ex_rate,
   }));
+};
+
+export const modifyStockTransaction = async (
+  token: UserToken,
+  payload: UpdateStockTransactionPayload
+) => {
+  await fetch(`/stock/transaction`, {
+    method: "PATCH",
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json",
+      ...prepareAuthHeader(token),
+    },
+    body: JSON.stringify(payload),
+  });
+};
+
+export const deleteStockTransaction = async (
+  token: UserToken,
+  stockTransactionId: number
+) => {
+  await fetch(`/stock/transaction`, {
+    method: "DELETE",
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json",
+      ...prepareAuthHeader(token),
+    },
+    body: JSON.stringify({ stock_transaction_id: stockTransactionId }),
+  });
 };

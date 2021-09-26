@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useHistory, /*useLocation,*/ useParams } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import classnames from "classnames";
 import Select from "react-select";
 
@@ -7,17 +7,18 @@ import {
   createStockTransaction,
   fetchOrCreateStock,
   fetchTradedStock,
+  modifyStockTransaction,
 } from "../../api/stocks";
 import {
   Stock,
-  //StockTransaction,
+  StockTransaction,
   TradedStock,
   UserToken,
 } from "../../api/types";
 import { Button } from "../../components/Button";
 import { GridCell, GridList } from "../../components/GridList";
 import { Input } from "../../components/Input";
-import { parseDecimal } from "../../utils";
+import { datetimeToDate, dateToDatetime, parseDecimal } from "../../utils";
 
 import style from "./AddStockTransactionPage.module.scss";
 
@@ -33,14 +34,14 @@ enum Actions {
 const AddStockTransactionPage = ({
   authToken,
 }: AddStockTransactionPageProps) => {
-  const { ownerId, stockId } =
+  const { ownerId, stockId, action } =
     useParams<{
       ownerId: string;
       stockId: string | undefined;
       action: Actions;
     }>();
   const history = useHistory();
-  //const { state } = useLocation<{ transaction: StockTransaction }>();
+  const { state } = useLocation<{ transaction: StockTransaction }>();
 
   const [symbol, setSymbol] = useState("");
   const [stock, setStock] = useState<Stock | TradedStock | null>(null);
@@ -51,14 +52,28 @@ const AddStockTransactionPage = ({
   const [taxHint, setTaxHint] = useState<string>("");
   const [commissionHint, setCommissionHint] = useState<string>("");
 
-  const [price, setPrice] = useState<number | null>(null);
-  const [exRate, setExRate] = useState<number | null>(null);
-  const [quantity, setQuantity] = useState<number | null>(null);
-  const [tax, setTax] = useState<number | null>(null);
-  const [commission, setCommission] = useState<number | null>(null);
-  const [date, setDate] = useState<string | null>(null);
+  const [price, setPrice] = useState<number | null>(
+    state && state.transaction ? state.transaction.price : null
+  );
+  const [exRate, setExRate] = useState<number | null>(
+    state && state.transaction ? state.transaction.transactionExRate : null
+  );
+  const [quantity, setQuantity] = useState<number | null>(
+    state && state.transaction ? state.transaction.quantity : null
+  );
+  const [tax, setTax] = useState<number | null>(
+    state && state.transaction ? state.transaction.tax : null
+  );
+  const [commission, setCommission] = useState<number | null>(
+    state && state.transaction ? state.transaction.commission : null
+  );
+  const [date, setDate] = useState<string | null>(
+    state && state.transaction ? datetimeToDate(state.transaction.date) : null
+  );
   const [transactionType, setTransactionType] = useState<string | null>(null);
-  const [note, setNote] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(
+    state && state.transaction ? state.transaction.transactionNote : null
+  );
 
   useEffect(() => {
     void (async () => {
@@ -129,7 +144,7 @@ const AddStockTransactionPage = ({
       commission === null ||
       date === null ||
       date === "" ||
-      transactionType === null ||
+      (transactionType === null && action === Actions.ADD) ||
       priceHint !== "" ||
       quantityHint !== "" ||
       taxHint !== "" ||
@@ -148,7 +163,80 @@ const AddStockTransactionPage = ({
     taxHint,
     transactionType,
     exRateHint,
+    action,
   ]);
+
+  const onConfirm = useMemo(
+    () =>
+      action === Actions.ADD
+        ? async () => {
+            if (
+              price !== null &&
+              quantity !== null &&
+              tax !== null &&
+              commission !== null &&
+              date !== null &&
+              transactionType !== null
+            ) {
+              await createStockTransaction(authToken, Number(ownerId), {
+                stock_id: (stock as Stock).stockId,
+                price,
+                quantity,
+                tax,
+                commission,
+                date: dateToDatetime(date),
+                transaction_type: transactionType,
+                transaction_note: note,
+                transaction_ex_rate: exRate,
+              });
+              history.push(
+                `/transaction/${ownerId}/stock/${(stock as Stock).stockId}`
+              );
+            }
+          }
+        : async () => {
+            if (
+              state &&
+              state.transaction &&
+              price !== null &&
+              quantity !== null &&
+              tax !== null &&
+              commission !== null &&
+              date !== null
+            ) {
+              await modifyStockTransaction(authToken, {
+                stock_transaction_id: state.transaction.stockTransactionId,
+                price,
+                quantity,
+                tax,
+                commission,
+                date: dateToDatetime(date),
+                transaction_note: note,
+                transaction_ex_rate: exRate,
+              });
+
+              history.push(
+                `/transaction/${ownerId}/stock/${state.transaction.stockId}`
+              );
+            }
+          },
+    [
+      action,
+      authToken,
+      commission,
+      date,
+      exRate,
+      history,
+      note,
+      ownerId,
+      price,
+      quantity,
+      state,
+      stock,
+      tax,
+      transactionType,
+    ]
+  );
 
   return (
     <div className={style.AddStockTransactionPage}>
@@ -172,6 +260,7 @@ const AddStockTransactionPage = ({
       {stock && (
         <section className={style.TransactionParameters}>
           <Input
+            value={price}
             className={classnames(style.Input, style.Parameter, style.Mobile)}
             label="Price: "
             inputType="text"
@@ -189,6 +278,7 @@ const AddStockTransactionPage = ({
             hint={priceHint}
           />
           <Input
+            value={exRate}
             className={classnames(style.Input, style.Parameter, style.Mobile)}
             label="Exchange Rate: "
             inputType="text"
@@ -206,6 +296,7 @@ const AddStockTransactionPage = ({
             hint={exRateHint}
           />
           <Input
+            value={quantity}
             className={classnames(style.Input, style.Parameter, style.Mobile)}
             label="Quantity: "
             inputType="text"
@@ -228,6 +319,7 @@ const AddStockTransactionPage = ({
             hint={quantityHint}
           />
           <Input
+            value={tax}
             className={classnames(style.Input, style.Parameter, style.Mobile)}
             label="Tax: "
             inputType="text"
@@ -245,6 +337,7 @@ const AddStockTransactionPage = ({
             hint={taxHint}
           />
           <Input
+            value={commission}
             className={classnames(style.Input, style.Parameter, style.Mobile)}
             label="Commission: "
             inputType="text"
@@ -262,6 +355,7 @@ const AddStockTransactionPage = ({
             hint={commissionHint}
           />
           <Input
+            value={date}
             className={classnames(style.Input, style.Parameter, style.Mobile)}
             label="Date: "
             inputType="date"
@@ -269,21 +363,24 @@ const AddStockTransactionPage = ({
             onChange={setDate}
           />
 
-          <div className={style.TransactionType}>
-            <span>Transaction Type: </span>
-            <Select
-              className={style.Select}
-              options={[
-                { label: "Buy", value: "buy" },
-                { label: "Sell", value: "sell" },
-              ]}
-              onChange={(o) => setTransactionType(o ? o.value : null)}
-            />
-          </div>
+          {action === Actions.ADD && (
+            <div className={style.TransactionType}>
+              <span>Transaction Type: </span>
+              <Select
+                className={style.Select}
+                options={[
+                  { label: "Buy", value: "buy" },
+                  { label: "Sell", value: "sell" },
+                ]}
+                onChange={(o) => setTransactionType(o ? o.value : null)}
+              />
+            </div>
+          )}
 
           <div className={style.TransactionNotes}>
             <label htmlFor="note">Notes: </label>
             <textarea
+              value={note ? note : ""}
               onChange={(e) => setNote(e.target.value)}
               name="note"
               cols={40}
@@ -293,34 +390,7 @@ const AddStockTransactionPage = ({
 
           <div className={style.ActionButtons}>
             <Button onClick={() => history.goBack()}>Cancel</Button>
-            <Button
-              disabled={confirmedDisabled}
-              onClick={async () => {
-                if (
-                  price !== null &&
-                  quantity !== null &&
-                  tax !== null &&
-                  commission !== null &&
-                  date !== null &&
-                  transactionType !== null
-                ) {
-                  await createStockTransaction(authToken, Number(ownerId), {
-                    stock_id: stock.stockId,
-                    price,
-                    quantity,
-                    tax,
-                    commission,
-                    date: `${date}T12:00:00.000000`,
-                    transaction_type: transactionType,
-                    transaction_note: note,
-                    transaction_ex_rate: exRate,
-                  });
-                  history.push(
-                    `/transaction/${ownerId}/stock/${stock.stockId}`
-                  );
-                }
-              }}
-            >
+            <Button disabled={confirmedDisabled} onClick={onConfirm}>
               Confirm
             </Button>
           </div>
