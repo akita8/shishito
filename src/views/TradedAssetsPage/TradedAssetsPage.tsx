@@ -3,7 +3,7 @@ import { useHistory, useParams } from "react-router";
 import { fetchOwner } from "../../api/account";
 
 import { fetchTradedStocks } from "../../api/stocks";
-import { OwnerDetails, TradedStocks, UserToken } from "../../api/types";
+import { OwnerDetails, TradedStock, TradedStocks, UserToken } from "../../api/types";
 import { Accordion, ExpandableRowProps } from "../../components/Accordion";
 import { Button } from "../../components/Button";
 import { GridCell, GridList } from "../../components/GridList";
@@ -16,7 +16,92 @@ interface TradedAssetsPageProps {
   authToken: UserToken;
   baseCurrency: string;
 }
+interface TradedStockGridProps {
+  stock: TradedStock
+  baseCurrency: string;
+}
 
+interface TrendingProfitAndLossProps {
+  profitAndLoss: number
+  formatter: Intl.NumberFormat
+}
+
+const TrendingProfitAndLoss = ({profitAndLoss, formatter}: TrendingProfitAndLossProps) => (
+  <TrendingNumber
+      className={style.ProfitAndLoss}
+      value={formatter.format(profitAndLoss)}
+      positive={profitAndLoss === 0 ? null : profitAndLoss > 0}
+    />
+)
+
+export const TradedStockGrid = ({stock, baseCurrency}: TradedStockGridProps) => {
+  const cells = useMemo(() => {
+    const currency = stock.isoCurrency.toUpperCase();
+    const baseFormatter = new Intl.NumberFormat(navigator.language, {
+      style: "currency",
+      currency: baseCurrency.toUpperCase(),
+    });
+    const nativeFormatter = new Intl.NumberFormat(navigator.language, {
+      style: "currency",
+      currency: currency,
+    });
+    const numberFormatter = new Intl.NumberFormat(navigator.language, {
+      maximumSignificantDigits: 3,
+    });
+    return [
+      {
+        field: "Name",
+        value: stock.shortName,
+      },
+      {
+        field: "Quantity",
+        value: numberFormatter.format(stock.currentQuantity),
+      },
+      {
+        field: "Fiscal Price",
+        value: nativeFormatter.format(stock.fiscalPrice),
+      },
+      {
+        field: `Fiscal Price (${baseCurrency})`,
+        value: baseFormatter.format(stock.fiscalPriceConverted),
+      },
+      {
+        field: "Last Price",
+        value: nativeFormatter.format(stock.lastPrice),
+      },
+      {
+        field: "Invested",
+        value: nativeFormatter.format(stock.invested),
+      },
+      {
+        field: `Invested (${baseCurrency})`,
+        value: baseFormatter.format(stock.investedCoverted),
+      },
+      {
+        field: "Ctv",
+        value: nativeFormatter.format(stock.currentCtv),
+      },
+      {
+        field: `Ctv (${baseCurrency})`,
+        value: baseFormatter.format(stock.currentCtvConverted),
+      },
+      {
+        field: "Profit and Loss",
+        value: (
+          <TrendingProfitAndLoss profitAndLoss={stock.profitAndLoss} formatter={nativeFormatter} />
+        ),
+      },
+      {
+        field: `Profit and Loss (${baseCurrency})`,
+        value: (
+          <TrendingProfitAndLoss profitAndLoss={stock.profitAndLossConverted} formatter={baseFormatter} />
+        ),
+      },
+    ]
+  }, [baseCurrency, stock])
+  return <GridList cells={cells}/>
+}
+ 
 const TradedAssetsPage = ({
   authToken,
   baseCurrency,
@@ -34,16 +119,9 @@ const TradedAssetsPage = ({
       return sortedStocks.map((s) => {
         const currency = s.isoCurrency.toUpperCase();
         const lang = navigator.language;
-        const baseFormatter = new Intl.NumberFormat(lang, {
-          style: "currency",
-          currency: baseCurrency.toUpperCase(),
-        });
         const nativeFormatter = new Intl.NumberFormat(lang, {
           style: "currency",
           currency: currency,
-        });
-        const numberFormatter = new Intl.NumberFormat(lang, {
-          maximumSignificantDigits: 3,
         });
         const profitAndLoss = (
           <TrendingNumber
@@ -57,59 +135,26 @@ const TradedAssetsPage = ({
           title: (
             <span className={style.Info}>
               <span className={style.Title}>
-                {`${s.symbol} - ${currency} - ${s.market}`}
+                {`${s.symbol} - ${s.isoCurrency.toUpperCase()} - ${s.market}`}
               </span>
               {profitAndLoss}
             </span>
           ),
           onMoreInfo: () =>
             history.push(`/transaction/${ownerId}/stock/${s.stockId}`),
-          component: (
-            <GridList
-              cells={[
-                {
-                  field: "Name",
-                  value: s.shortName,
-                },
-                {
-                  field: "Quantity",
-                  value: numberFormatter.format(s.currentQuantity),
-                },
-                {
-                  field: "Fiscal Price",
-                  value: nativeFormatter.format(s.fiscalPrice),
-                },
-                {
-                  field: "Last Price",
-                  value: nativeFormatter.format(s.lastPrice),
-                },
-                {
-                  field: "Invested",
-                  value: nativeFormatter.format(s.invested),
-                },
-                {
-                  field: "Ctv",
-                  value: nativeFormatter.format(s.currentCtv),
-                },
-                {
-                  field: `Ctv (${baseCurrency})`,
-                  value: baseFormatter.format(s.currentCtvConverted),
-                },
-                {
-                  field: "Profit and Loss",
-                  value: profitAndLoss,
-                },
-              ]}
-            />
-          ),
+          component: <TradedStockGrid stock={s} baseCurrency={baseCurrency}/>,
         };
       });
     } else return [];
   }, [tradedStocks, baseCurrency, history, ownerId]);
 
   const infoCells = useMemo<GridCell[]>(
-    () =>
-      owner
+    () => {
+      const formatter = new Intl.NumberFormat(navigator.language, {
+        style: "currency",
+        currency: baseCurrency.toUpperCase(),
+      })
+      return owner
         ? [
             {
               field: "Owner",
@@ -126,14 +171,24 @@ const TradedAssetsPage = ({
             {
               field: `Ctv (${baseCurrency})`,
               value: tradedStocks
-                ? new Intl.NumberFormat(navigator.language, {
-                    style: "currency",
-                    currency: baseCurrency.toUpperCase(),
-                  }).format(tradedStocks.currentCtvConverted)
+                ? formatter.format(tradedStocks.currentCtvConverted)
+                : "",
+            },
+            {
+              field: `Invested (${baseCurrency})`,
+              value: tradedStocks
+                ? formatter.format(tradedStocks.investedConverted)
+                : "",
+            },
+            {
+              field: `Profit and Loss (${baseCurrency})`,
+              value: tradedStocks
+                ? formatter.format(tradedStocks.profitAndLossConverted)
                 : "",
             },
           ]
-        : [],
+        : []
+    },
     [owner, tradedStocks, baseCurrency]
   );
 

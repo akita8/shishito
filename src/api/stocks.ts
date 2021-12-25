@@ -38,8 +38,14 @@ export const fetchTradedStocks = async (
       invested: s.invested,
       currentCtv: s.current_ctv,
       shortName: s.short_name,
+      fiscalPriceConverted: s.fiscal_price_converted,
+      profitAndLossConverted: s.profit_and_loss_converted,
+      investedCoverted: s.invested_converted,
+      
     })),
     currentCtvConverted: data.current_ctv_converted,
+    investedConverted: data.invested_converted,
+    profitAndLossConverted: data.profit_and_loss_converted,
   };
 };
 
@@ -68,6 +74,9 @@ export const fetchTradedStock = async (
     invested: data.invested,
     currentCtv: data.current_ctv,
     shortName: data.short_name,
+    fiscalPriceConverted: data.fiscal_price_converted,
+    profitAndLossConverted: data.profit_and_loss_converted,
+    investedCoverted: data.invested_converted
   };
 };
 

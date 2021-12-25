@@ -3,8 +3,9 @@ import { useHistory, useParams } from "react-router";
 import {
   deleteStockTransaction,
   fetchStockTransactions,
+  fetchTradedStock,
 } from "../../api/stocks";
-import { StockTransaction, UserToken } from "../../api/types";
+import { StockTransaction, TradedStock, UserToken } from "../../api/types";
 import { Button } from "../../components/Button";
 import { Header, Row, SortOrder, Table } from "../../components/Table";
 import { ReactComponent as Plus } from "../../icons/plus.svg";
@@ -14,19 +15,31 @@ import { ReactComponent as Trash } from "../../icons/trash.svg";
 
 import style from "./StockTransactionHistoryPage.module.scss";
 import { datetimeToDate } from "../../utils";
+import { TradedStockGrid } from "../TradedAssetsPage/TradedAssetsPage";
 
 interface StockTransactionHistoryPageProps {
   authToken: UserToken;
+  baseCurrency: string;
 }
 
 const StockTransactionHistoryPage = ({
-  authToken,
+  authToken, baseCurrency
 }: StockTransactionHistoryPageProps) => {
   const history = useHistory();
   const { ownerId, stockId } =
     useParams<{ ownerId: string; stockId: string }>();
   const [transactions, setTransactions] = useState<StockTransaction[]>([]);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [stock, setStock] = useState<TradedStock | null>(null);
+
+  useEffect(() => {
+    void (async () => {
+        setStock(
+          await fetchTradedStock(authToken, Number(ownerId), Number(stockId))
+        );
+    })();
+  }, [authToken, stockId, ownerId]);
+  
   useEffect(() => {
     void (async () => {
       const retrievedTransactions = await fetchStockTransactions(
@@ -87,6 +100,10 @@ const StockTransactionHistoryPage = ({
 
   return (
     <div className={style.StockTransactionHistoryPage}>
+      {
+        stock &&
+        <TradedStockGrid stock={stock} baseCurrency={baseCurrency}/>
+      }
       <section className={style.ActionButtons}>
         <Button
           onClick={() =>

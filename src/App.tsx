@@ -84,7 +84,13 @@ function App() {
             {authToken && <AddStockTransactionPage authToken={authToken} />}
           </Route>
           <Route exact path="/transaction/:ownerId/stock/:stockId">
-            {authToken && <StockTransactionHistoryPage authToken={authToken} />}
+            {
+              authToken && user && (
+              <StockTransactionHistoryPage
+                baseCurrency={user.baseCurrency}
+                authToken={authToken} />
+              )
+            }
           </Route>
         </Suspense>
       </DefaultLayout>

@@ -59,11 +59,16 @@ export interface TradedStockResponse {
   invested: number;
   current_ctv: number;
   short_name: string;
+  fiscal_price_converted: number
+  profit_and_loss_converted: number
+  invested_converted: number
 }
 
 export interface TradedStocksResponse {
   stocks: TradedStockResponse[];
   current_ctv_converted: number;
+  profit_and_loss_converted: number;
+  invested_converted: number;
 }
 
 export interface TradedStock {
@@ -79,11 +84,16 @@ export interface TradedStock {
   invested: number;
   currentCtv: number;
   shortName: string;
+  fiscalPriceConverted: number
+  profitAndLossConverted: number
+  investedCoverted: number
 }
 
 export interface TradedStocks {
   stocks: TradedStock[];
   currentCtvConverted: number;
+  profitAndLossConverted: number
+  investedConverted: number
 }
 
 export interface StockResponse {

@@ -21,8 +21,6 @@ export const DefaultLayout = ({
       </Link>
       {username && <span>{username}</span>}
     </header>
-    <div className={style.LeftBar} />
     <main>{children}</main>
-    <div className={style.RightBar} />
   </div>
 );
