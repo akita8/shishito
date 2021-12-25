@@ -23,7 +23,8 @@ interface StockTransactionHistoryPageProps {
 }
 
 const StockTransactionHistoryPage = ({
-  authToken, baseCurrency
+  authToken,
+  baseCurrency,
 }: StockTransactionHistoryPageProps) => {
   const history = useHistory();
   const { ownerId, stockId } =
@@ -34,12 +35,12 @@ const StockTransactionHistoryPage = ({
 
   useEffect(() => {
     void (async () => {
-        setStock(
-          await fetchTradedStock(authToken, Number(ownerId), Number(stockId))
-        );
+      setStock(
+        await fetchTradedStock(authToken, Number(ownerId), Number(stockId))
+      );
     })();
   }, [authToken, stockId, ownerId]);
-  
+
   useEffect(() => {
     void (async () => {
       const retrievedTransactions = await fetchStockTransactions(
@@ -100,10 +101,7 @@ const StockTransactionHistoryPage = ({
 
   return (
     <div className={style.StockTransactionHistoryPage}>
-      {
-        stock &&
-        <TradedStockGrid stock={stock} baseCurrency={baseCurrency}/>
-      }
+      {stock && <TradedStockGrid stock={stock} baseCurrency={baseCurrency} />}
       <section className={style.ActionButtons}>
         <Button
           onClick={() =>

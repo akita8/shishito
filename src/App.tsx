@@ -41,8 +41,13 @@ function App() {
   }, [authToken, history]);
 
   const index = useMemo(
-    () => <>{accounts && user && <IndexPage accounts={accounts} />}</>,
-    [accounts, user]
+    () =>
+      authToken && accounts && user ? (
+        <IndexPage accounts={accounts} authToken={authToken} />
+      ) : (
+        <></>
+      ),
+    [accounts, user, authToken]
   );
 
   return (
@@ -84,13 +89,12 @@ function App() {
             {authToken && <AddStockTransactionPage authToken={authToken} />}
           </Route>
           <Route exact path="/transaction/:ownerId/stock/:stockId">
-            {
-              authToken && user && (
+            {authToken && user && (
               <StockTransactionHistoryPage
                 baseCurrency={user.baseCurrency}
-                authToken={authToken} />
-              )
-            }
+                authToken={authToken}
+              />
+            )}
           </Route>
         </Suspense>
       </DefaultLayout>

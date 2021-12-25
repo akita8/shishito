@@ -1,4 +1,5 @@
 import { useState } from "react";
+import classnames from 'classnames'
 
 import { Card } from "../Card";
 import { ReactComponent as ChevronDown } from "../../icons/chevron-down.svg";
@@ -55,7 +56,7 @@ const ExpandableRow = ({
 
 export const Accordion = ({ rows, className }: AccordionProps) => {
   return (
-    <ul className={className}>
+    <ul className={classnames(style.Accordion, className)}>
       {rows.map((r) => (
         <span key={r.id}>
           <ExpandableRow {...r} />

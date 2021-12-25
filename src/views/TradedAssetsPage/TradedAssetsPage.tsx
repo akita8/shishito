@@ -1,14 +1,22 @@
 import { useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import { fetchOwner } from "../../api/account";
+import classnames from "classnames";
 
-import { fetchTradedStocks } from "../../api/stocks";
-import { OwnerDetails, TradedStock, TradedStocks, UserToken } from "../../api/types";
+import { fetchOwner } from "../../api/account";
+import { fetchStockAlerts, fetchTradedStocks } from "../../api/stocks";
+import {
+  OwnerDetails,
+  StockAlert,
+  TradedStock,
+  TradedStocks,
+  UserToken,
+} from "../../api/types";
 import { Accordion, ExpandableRowProps } from "../../components/Accordion";
 import { Button } from "../../components/Button";
 import { GridCell, GridList } from "../../components/GridList";
 import { TrendingNumber } from "../../components/TrendingNumber";
 import { ReactComponent as Plus } from "../../icons/plus.svg";
+import { ReactComponent as Alert } from "../../icons/alert.svg";
 
 import style from "./TradedAssetsPage.module.scss";
 
@@ -17,24 +25,40 @@ interface TradedAssetsPageProps {
   baseCurrency: string;
 }
 interface TradedStockGridProps {
-  stock: TradedStock
+  stock: TradedStock;
   baseCurrency: string;
 }
 
 interface TrendingProfitAndLossProps {
-  profitAndLoss: number
-  formatter: Intl.NumberFormat
+  profitAndLoss: number;
+  formatter: Intl.NumberFormat;
 }
 
-const TrendingProfitAndLoss = ({profitAndLoss, formatter}: TrendingProfitAndLossProps) => (
+const TrendingProfitAndLoss = ({
+  profitAndLoss,
+  formatter,
+}: TrendingProfitAndLossProps) => (
   <TrendingNumber
-      className={style.ProfitAndLoss}
-      value={formatter.format(profitAndLoss)}
-      positive={profitAndLoss === 0 ? null : profitAndLoss > 0}
-    />
-)
+    className={style.ProfitAndLoss}
+    value={formatter.format(profitAndLoss)}
+    positive={profitAndLoss === 0 ? null : profitAndLoss > 0}
+  />
+);
 
-export const TradedStockGrid = ({stock, baseCurrency}: TradedStockGridProps) => {
+// const AlertMessages = {
+//   lower_limit_price: 1,
+//   upper_limit_price: null,
+//   dividend_date: null,
+//   fiscal_price_lower_than: "Last price is lower than fiscal price",
+//   fiscal_price_greater_than: "Fiscal price is greater than last price",
+//   profit_and_loss_lower_limit: null,
+//   profit_and_loss_upper_limit: null,
+// };
+
+export const TradedStockGrid = ({
+  stock,
+  baseCurrency,
+}: TradedStockGridProps) => {
   const cells = useMemo(() => {
     const currency = stock.isoCurrency.toUpperCase();
     const baseFormatter = new Intl.NumberFormat(navigator.language, {
@@ -75,7 +99,7 @@ export const TradedStockGrid = ({stock, baseCurrency}: TradedStockGridProps) => 
       },
       {
         field: `Invested (${baseCurrency})`,
-        value: baseFormatter.format(stock.investedCoverted),
+        value: baseFormatter.format(stock.investedConverted),
       },
       {
         field: "Ctv",
@@ -88,20 +112,26 @@ export const TradedStockGrid = ({stock, baseCurrency}: TradedStockGridProps) => 
       {
         field: "Profit and Loss",
         value: (
-          <TrendingProfitAndLoss profitAndLoss={stock.profitAndLoss} formatter={nativeFormatter} />
+          <TrendingProfitAndLoss
+            profitAndLoss={stock.profitAndLoss}
+            formatter={nativeFormatter}
+          />
         ),
       },
       {
         field: `Profit and Loss (${baseCurrency})`,
         value: (
-          <TrendingProfitAndLoss profitAndLoss={stock.profitAndLossConverted} formatter={baseFormatter} />
+          <TrendingProfitAndLoss
+            profitAndLoss={stock.profitAndLossConverted}
+            formatter={baseFormatter}
+          />
         ),
       },
-    ]
-  }, [baseCurrency, stock])
-  return <GridList cells={cells}/>
-}
- 
+    ];
+  }, [baseCurrency, stock]);
+  return <GridList cells={cells} />;
+};
+
 const TradedAssetsPage = ({
   authToken,
   baseCurrency,
@@ -109,10 +139,12 @@ const TradedAssetsPage = ({
   const history = useHistory();
   const { ownerId } = useParams<{ ownerId: string }>();
   const [tradedStocks, setTradedStocks] = useState<TradedStocks | null>(null);
+  const [stockAlerts, setStockAlerts] =
+    useState<Map<number, StockAlert> | null>(null);
   const [owner, setOwner] = useState<OwnerDetails | null>(null);
 
   const rows = useMemo<ExpandableRowProps[]>(() => {
-    if (tradedStocks) {
+    if (tradedStocks !== null && stockAlerts != null) {
       const sortedStocks = [...tradedStocks.stocks].sort((a, b) =>
         a.symbol.localeCompare(b.symbol)
       );
@@ -130,6 +162,7 @@ const TradedAssetsPage = ({
             positive={s.profitAndLoss === 0 ? null : s.profitAndLoss > 0}
           />
         );
+        const alert = stockAlerts.get(s.stockId);
         return {
           id: s.stockId,
           title: (
@@ -138,65 +171,96 @@ const TradedAssetsPage = ({
                 {`${s.symbol} - ${s.isoCurrency.toUpperCase()} - ${s.market}`}
               </span>
               {profitAndLoss}
+              {alert ? (
+                <Alert
+                  // onClick={() =>
+                  //   history.push(`/transaction/${ownerId}/stock/${s.stockId}`)
+                  // }
+                  className={classnames(style.Alert, {
+                    [style.TriggeredAlert]: alert.triggeredFields.length > 0,
+                  })}
+                />
+              ) : (
+                <></>
+              )}
             </span>
           ),
           onMoreInfo: () =>
             history.push(`/transaction/${ownerId}/stock/${s.stockId}`),
-          component: <TradedStockGrid stock={s} baseCurrency={baseCurrency}/>,
+          component: (
+            <>
+              <TradedStockGrid stock={s} baseCurrency={baseCurrency} />
+              {alert && alert.triggeredFields.length > 0 ? (
+                <section className={style.TriggeredFields}>
+                  <span>Triggered Alerts</span>
+                  <ul>
+                    {alert.triggeredFields.map((f) => (
+                      <li>{f}</li>
+                    ))}
+                  </ul>
+                </section>
+              ) : (
+                <></>
+              )}
+            </>
+          ),
         };
       });
     } else return [];
-  }, [tradedStocks, baseCurrency, history, ownerId]);
+  }, [tradedStocks, stockAlerts, baseCurrency, history, ownerId]);
 
-  const infoCells = useMemo<GridCell[]>(
-    () => {
-      const formatter = new Intl.NumberFormat(navigator.language, {
-        style: "currency",
-        currency: baseCurrency.toUpperCase(),
-      })
-      return owner
-        ? [
-            {
-              field: "Owner",
-              value: owner.name,
-            },
-            {
-              field: "Bank",
-              value: owner.bankName,
-            },
-            {
-              field: "Account Number",
-              value: owner.accountNumber,
-            },
-            {
-              field: `Ctv (${baseCurrency})`,
-              value: tradedStocks
-                ? formatter.format(tradedStocks.currentCtvConverted)
-                : "",
-            },
-            {
-              field: `Invested (${baseCurrency})`,
-              value: tradedStocks
-                ? formatter.format(tradedStocks.investedConverted)
-                : "",
-            },
-            {
-              field: `Profit and Loss (${baseCurrency})`,
-              value: tradedStocks
-                ? formatter.format(tradedStocks.profitAndLossConverted)
-                : "",
-            },
-          ]
-        : []
-    },
-    [owner, tradedStocks, baseCurrency]
-  );
+  const infoCells = useMemo<GridCell[]>(() => {
+    const formatter = new Intl.NumberFormat(navigator.language, {
+      style: "currency",
+      currency: baseCurrency.toUpperCase(),
+    });
+    return owner
+      ? [
+          {
+            field: "Owner",
+            value: owner.name,
+          },
+          {
+            field: "Bank",
+            value: owner.bankName,
+          },
+          {
+            field: "Account Number",
+            value: owner.accountNumber,
+          },
+          {
+            field: `Ctv (${baseCurrency})`,
+            value: tradedStocks
+              ? formatter.format(tradedStocks.currentCtvConverted)
+              : "",
+          },
+          {
+            field: `Invested (${baseCurrency})`,
+            value: tradedStocks
+              ? formatter.format(tradedStocks.investedConverted)
+              : "",
+          },
+          {
+            field: `Profit and Loss (${baseCurrency})`,
+            value: tradedStocks
+              ? formatter.format(tradedStocks.profitAndLossConverted)
+              : "",
+          },
+        ]
+      : [];
+  }, [owner, tradedStocks, baseCurrency]);
 
   useEffect(() => {
     void (async () => {
       const id = Number(ownerId);
       setOwner(await fetchOwner(authToken, id));
       setTradedStocks(await fetchTradedStocks(authToken, id));
+      const alerts = await fetchStockAlerts(authToken, id);
+      const indexedAlerts = new Map();
+      for (const alert of alerts) {
+        indexedAlerts.set(alert.stockId, alert);
+      }
+      setStockAlerts(indexedAlerts);
     })();
   }, [authToken, ownerId]);
 

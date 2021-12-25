@@ -1,33 +1,41 @@
 .IndexPage {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 350px));
-  gap: 2.5rem;
-  padding: 1rem;
-  .Card {
+  .UpdateStocks {
     display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    min-height: 300px;
-    header {
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+  .Accounts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 350px));
+    gap: 2.5rem;
+    padding: 1rem;
+    .Card {
       display: flex;
       flex-direction: column;
-      margin-bottom: 1rem;
-      align-items: center;
+      justify-content: space-between;
+      min-height: 300px;
+      header {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 1rem;
+        align-items: center;
 
-      .Bank {
-        font-size: 2rem;
+        .Bank {
+          font-size: 2rem;
+        }
+        .AccountNumber {
+          font-size: 1rem;
+          margin-top: 0.5rem;
+        }
       }
-      .AccountNumber {
-        font-size: 1rem;
-        margin-top: 0.5rem;
-      }
-    }
-    .Buttons {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      button:not(:first-child) {
-        margin-top: 0.2rem;
+      .Buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        button:not(:first-child) {
+          margin-top: 0.2rem;
+        }
       }
     }
   }

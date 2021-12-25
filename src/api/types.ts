@@ -59,9 +59,9 @@ export interface TradedStockResponse {
   invested: number;
   current_ctv: number;
   short_name: string;
-  fiscal_price_converted: number
-  profit_and_loss_converted: number
-  invested_converted: number
+  fiscal_price_converted: number;
+  profit_and_loss_converted: number;
+  invested_converted: number;
 }
 
 export interface TradedStocksResponse {
@@ -84,16 +84,16 @@ export interface TradedStock {
   invested: number;
   currentCtv: number;
   shortName: string;
-  fiscalPriceConverted: number
-  profitAndLossConverted: number
-  investedCoverted: number
+  fiscalPriceConverted: number;
+  profitAndLossConverted: number;
+  investedConverted: number;
 }
 
 export interface TradedStocks {
   stocks: TradedStock[];
   currentCtvConverted: number;
-  profitAndLossConverted: number
-  investedConverted: number
+  profitAndLossConverted: number;
+  investedConverted: number;
 }
 
 export interface StockResponse {
@@ -172,3 +172,34 @@ export interface UpdateStockTransactionPayload {
   transaction_ex_rate: number | null;
 }
 
+export interface StockAlertResponse {
+  stock_id: number;
+  owner_id: number;
+  lower_limit_price: number | null;
+  upper_limit_price: number | null;
+  dividend_date: string | null;
+  fiscal_price_lower_than: boolean | null;
+  fiscal_price_greater_than: boolean | null;
+  profit_and_loss_lower_limit: number | null;
+  profit_and_loss_upper_limit: number | null;
+  stock_alert_id: number;
+  triggered_fields: string[];
+}
+
+export interface StockAlertsResponse {
+  alerts: StockAlertResponse[];
+}
+
+export interface StockAlert {
+  stockId: number;
+  ownerId: number;
+  lowerLimitPrice: number | null;
+  upperLimitPrice: number | null;
+  dividendDate: string | null;
+  fiscalPriceLowerThan: boolean | null;
+  fiscalPriceGreaterThan: boolean | null;
+  profitAndLossLowerLimit: number | null;
+  profitAndLoss_upperLimit: number | null;
+  stockAlertId: number;
+  triggeredFields: string[];
+}

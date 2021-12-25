@@ -47,4 +47,29 @@
       }
     }
   }
+
+  .Alert {
+    height: 25px;
+    width: 25px;
+    margin-left: 25px;
+    color: rgb(151, 150, 150);
+  }
+  .TriggeredAlert {
+    color: #f6ab2f;
+  }
+
+  .TriggeredFields {
+    display: flex;
+    flex-direction: column;
+    padding-left: 40px;
+    margin-top: 20px;
+    span {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    ul {
+      list-style-type: disc;
+      margin-block-start: 4px;
+    }
+  }
 }

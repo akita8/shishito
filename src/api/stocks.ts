@@ -10,6 +10,8 @@ import {
   TradedStock,
   TradedStockResponse,
   UpdateStockTransactionPayload,
+  StockAlert,
+  StockAlertsResponse,
 } from "./types";
 import { prepareAuthHeader, strictFetch } from "./utils";
 
@@ -40,8 +42,7 @@ export const fetchTradedStocks = async (
       shortName: s.short_name,
       fiscalPriceConverted: s.fiscal_price_converted,
       profitAndLossConverted: s.profit_and_loss_converted,
-      investedCoverted: s.invested_converted,
-      
+      investedConverted: s.invested_converted,
     })),
     currentCtvConverted: data.current_ctv_converted,
     investedConverted: data.invested_converted,
@@ -76,7 +77,7 @@ export const fetchTradedStock = async (
     shortName: data.short_name,
     fiscalPriceConverted: data.fiscal_price_converted,
     profitAndLossConverted: data.profit_and_loss_converted,
-    investedCoverted: data.invested_converted
+    investedConverted: data.invested_converted,
   };
 };
 
@@ -178,4 +179,47 @@ export const deleteStockTransaction = async (
     },
     body: JSON.stringify({ stock_transaction_id: stockTransactionId }),
   });
+};
+
+export const updateStocks = async (token: UserToken) => {
+  await fetch(`/stock/`, {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      ...prepareAuthHeader(token),
+    },
+  });
+  await fetch(`/stock/currency/`, {
+    method: "POST",
+    headers: {
+      accept: "application/json",
+      ...prepareAuthHeader(token),
+    },
+  });
+};
+
+export const fetchStockAlerts = async (
+  token: UserToken,
+  ownerID: number
+): Promise<StockAlert[]> => {
+  const response = await fetch(`/stock/alert/${ownerID}/`, {
+    headers: {
+      accept: "application/json",
+      ...prepareAuthHeader(token),
+    },
+  });
+  const data: StockAlertsResponse = await response.json();
+  return data.alerts.map((a) => ({
+    stockId: a.stock_id,
+    ownerId: a.owner_id,
+    lowerLimitPrice: a.lower_limit_price,
+    upperLimitPrice: a.upper_limit_price,
+    dividendDate: a.dividend_date,
+    fiscalPriceLowerThan: a.fiscal_price_lower_than,
+    fiscalPriceGreaterThan: a.fiscal_price_greater_than,
+    profitAndLossLowerLimit: a.profit_and_loss_lower_limit,
+    profitAndLoss_upperLimit: a.profit_and_loss_upper_limit,
+    stockAlertId: a.stock_alert_id,
+    triggeredFields: a.triggered_fields,
+  }));
 };
