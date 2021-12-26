@@ -43,7 +43,11 @@ function App() {
   const index = useMemo(
     () =>
       authToken && accounts && user ? (
-        <IndexPage accounts={accounts} authToken={authToken} />
+        <IndexPage
+          accounts={accounts}
+          authToken={authToken}
+          baseCurrency={user.baseCurrency}
+        />
       ) : (
         <></>
       ),

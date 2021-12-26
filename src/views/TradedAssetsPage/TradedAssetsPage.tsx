@@ -16,7 +16,7 @@ import { Button } from "../../components/Button";
 import { GridCell, GridList } from "../../components/GridList";
 import { TrendingNumber } from "../../components/TrendingNumber";
 import { ReactComponent as Plus } from "../../icons/plus.svg";
-import { ReactComponent as Alert } from "../../icons/alert.svg";
+import { ReactComponent as AlertIcon } from "../../icons/alert.svg";
 
 import style from "./TradedAssetsPage.module.scss";
 
@@ -45,15 +45,68 @@ const TrendingProfitAndLoss = ({
   />
 );
 
-// const AlertMessages = {
-//   lower_limit_price: 1,
-//   upper_limit_price: null,
-//   dividend_date: null,
-//   fiscal_price_lower_than: "Last price is lower than fiscal price",
-//   fiscal_price_greater_than: "Fiscal price is greater than last price",
-//   profit_and_loss_lower_limit: null,
-//   profit_and_loss_upper_limit: null,
-// };
+enum Alert {
+  lowerLimitPrice = "lower_limit_price",
+  upperLimitPrice = "upper_limit_price",
+  dividendDate = "dividend_date",
+  fiscalPriceLowerThan = "fiscal_price_lower_than",
+  fiscalPriceGreaterThan = "fiscal_price_greater_than",
+  profitAndLossLowerThan = "profit_and_loss_lower_limit",
+  profitAndLossGreaterThan = "profit_and_loss_upper_limit",
+}
+
+const AlertMessages = {
+  [Alert.lowerLimitPrice]: (lastPrice: string, limit: string) =>
+    `Last price ${lastPrice} lower than lower limit ${limit}`,
+  [Alert.upperLimitPrice]: (lastPrice: string, limit: string) =>
+    `Last price ${lastPrice} greater than upper limit ${limit}`,
+  [Alert.dividendDate]: (date: string) => `Dividend date ${date} has expired`,
+  [Alert.fiscalPriceLowerThan]: () => "Fiscal price is lower than last price",
+  [Alert.fiscalPriceGreaterThan]: () =>
+    "Fiscal price is greater than last price",
+  [Alert.profitAndLossLowerThan]: (profitAndLoss: string, limit: string) =>
+    `Profit and loss ${profitAndLoss} lower than lower limit ${limit}`,
+  [Alert.profitAndLossGreaterThan]: (profitAndLoss: string, limit: string) =>
+    `Profit and loss ${profitAndLoss} greater than upper limit ${limit}`,
+};
+
+const createAlertMessage = (
+  stock: TradedStock,
+  alert: StockAlert,
+  triggeredField: string,
+  currencyFormatter: Intl.NumberFormat
+) => {
+  switch (triggeredField) {
+    case Alert.lowerLimitPrice:
+      return AlertMessages[triggeredField](
+        currencyFormatter.format(stock.lastPrice),
+        currencyFormatter.format(alert.lowerLimitPrice as number)
+      );
+    case Alert.upperLimitPrice:
+      return AlertMessages[triggeredField](
+        currencyFormatter.format(stock.lastPrice),
+        currencyFormatter.format(alert.upperLimitPrice as number)
+      );
+    case Alert.dividendDate:
+      return AlertMessages[triggeredField](alert.dividendDate as string);
+    case Alert.fiscalPriceLowerThan:
+      return AlertMessages[triggeredField]();
+    case Alert.fiscalPriceGreaterThan:
+      return AlertMessages[triggeredField]();
+    case Alert.profitAndLossLowerThan:
+      return AlertMessages[triggeredField](
+        currencyFormatter.format(stock.profitAndLoss),
+        currencyFormatter.format(alert.profitAndLossLowerLimit as number)
+      );
+    case Alert.profitAndLossGreaterThan:
+      return AlertMessages[triggeredField](
+        currencyFormatter.format(stock.profitAndLoss),
+        currencyFormatter.format(alert.profitAndLossUpperLimit as number)
+      );
+    default:
+      throw Error("missing formatter for alert field");
+  }
+};
 
 export const TradedStockGrid = ({
   stock,
@@ -172,10 +225,7 @@ const TradedAssetsPage = ({
               </span>
               {profitAndLoss}
               {alert ? (
-                <Alert
-                  // onClick={() =>
-                  //   history.push(`/transaction/${ownerId}/stock/${s.stockId}`)
-                  // }
+                <AlertIcon
                   className={classnames(style.Alert, {
                     [style.TriggeredAlert]: alert.triggeredFields.length > 0,
                   })}
@@ -195,7 +245,9 @@ const TradedAssetsPage = ({
                   <span>Triggered Alerts</span>
                   <ul>
                     {alert.triggeredFields.map((f) => (
-                      <li>{f}</li>
+                      <li>
+                        {createAlertMessage(s, alert, f, nativeFormatter)}
+                      </li>
                     ))}
                   </ul>
                 </section>

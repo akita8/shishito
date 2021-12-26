@@ -26,6 +26,7 @@ export interface AccountsResponse {
     account_number: number;
     bank: string;
     bank_name: string;
+    current_stock_ctv: number;
     owners: {
       name: string;
       owner_id: number;
@@ -44,6 +45,7 @@ export interface BankAccount {
   bank: string;
   bankName: string;
   owners: Owner[];
+  currentStockCtv: number;
 }
 
 export interface TradedStockResponse {
@@ -199,7 +201,7 @@ export interface StockAlert {
   fiscalPriceLowerThan: boolean | null;
   fiscalPriceGreaterThan: boolean | null;
   profitAndLossLowerLimit: number | null;
-  profitAndLoss_upperLimit: number | null;
+  profitAndLossUpperLimit: number | null;
   stockAlertId: number;
   triggeredFields: string[];
 }

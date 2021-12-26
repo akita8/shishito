@@ -218,7 +218,7 @@ export const fetchStockAlerts = async (
     fiscalPriceLowerThan: a.fiscal_price_lower_than,
     fiscalPriceGreaterThan: a.fiscal_price_greater_than,
     profitAndLossLowerLimit: a.profit_and_loss_lower_limit,
-    profitAndLoss_upperLimit: a.profit_and_loss_upper_limit,
+    profitAndLossUpperLimit: a.profit_and_loss_upper_limit,
     stockAlertId: a.stock_alert_id,
     triggeredFields: a.triggered_fields,
   }));

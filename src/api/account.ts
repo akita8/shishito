@@ -23,6 +23,7 @@ export const fetchAccounts = async (
     bank: a.bank,
     bankName: a.bank_name,
     owners: a.owners.map((o) => ({ ownerId: o.owner_id, name: o.name })),
+    currentStockCtv: a.current_stock_ctv,
   }));
 };
 

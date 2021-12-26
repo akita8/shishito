@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useHistory } from "react-router";
 import ClipLoader from "react-spinners/ClipLoader";
 
@@ -12,11 +12,22 @@ import style from "./IndexPage.module.scss";
 interface IndexPageProps {
   accounts: BankAccount[];
   authToken: UserToken;
+  baseCurrency: string;
 }
 
-const IndexPage = ({ accounts, authToken }: IndexPageProps) => {
+const IndexPage = ({ accounts, authToken, baseCurrency }: IndexPageProps) => {
   const history = useHistory();
   const [updatingStocks, setUpdatingStocks] = useState(false);
+
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(navigator.language, {
+        style: "currency",
+        currency: baseCurrency.toUpperCase(),
+      }),
+    [baseCurrency]
+  );
+
   return (
     <div className={style.IndexPage}>
       <div className={style.UpdateStocks}>
@@ -40,6 +51,9 @@ const IndexPage = ({ accounts, authToken }: IndexPageProps) => {
             <header>
               <span className={style.Bank}>{a.bankName}</span>
               <span className={style.AccountNumber}>{a.accountNumber}</span>
+              <span className={style.AccountCtv}>
+                {currencyFormatter.format(a.currentStockCtv)}
+              </span>
             </header>
             <div className={style.Buttons}>
               {a.owners.map((o) => (
