@@ -13,9 +13,10 @@ interface IndexPageProps {
   accounts: BankAccount[];
   authToken: UserToken;
   baseCurrency: string;
+  onUpdateStock: () => void
 }
 
-const IndexPage = ({ accounts, authToken, baseCurrency }: IndexPageProps) => {
+const IndexPage = ({ accounts, authToken, baseCurrency, onUpdateStock }: IndexPageProps) => {
   const history = useHistory();
   const [updatingStocks, setUpdatingStocks] = useState(false);
 
@@ -38,6 +39,7 @@ const IndexPage = ({ accounts, authToken, baseCurrency }: IndexPageProps) => {
             onClick={async () => {
               setUpdatingStocks(true);
               await updateStocks(authToken);
+              onUpdateStock()
               setUpdatingStocks(false);
             }}
           >

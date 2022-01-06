@@ -47,6 +47,7 @@ function App() {
           accounts={accounts}
           authToken={authToken}
           baseCurrency={user.baseCurrency}
+          onUpdateStock={async () => setAccount(await fetchAccounts(authToken))}
         />
       ) : (
         <></>

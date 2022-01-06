@@ -25,13 +25,13 @@ const validateNumber =
     additionalValidation?: (rawValue: string, value: number) => boolean
   ) =>
   (value: string) => {
-    console.log(value, setNullWhenEmpty);
     if (setNullWhenEmpty && value === "") {
       setValue(null);
       return;
     }
     const num = parseDecimal(value);
-    if (value !== "" && !isNaN(num) && additionalValidation?.(value, num)) {
+    const isValid = additionalValidation ? additionalValidation(value, num) : true
+    if (value !== "" && !isNaN(num) && isValid) {
       setHint("");
       setValue(num);
     } else {
