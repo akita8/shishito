@@ -35,7 +35,6 @@
       display: flex;
       justify-content: space-between;
       margin-bottom: 2rem;
-      width: 33%;
       word-break: keep-all;
       input {
         width: 300px;
@@ -49,8 +48,8 @@
       flex-wrap: wrap;
       gap: 3rem;
       margin-bottom: 2rem;
+      margin-right: 1rem;
       font-size: 1rem;
-      width: 33%;
 
       @media only screen and (max-width: 600px) {
         width: 100%;

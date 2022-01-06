@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useHistory, useParams } from "react-router";
-import classnames from "classnames";
 
 import { fetchOwner } from "../../api/account";
 import { fetchStockAlerts, fetchTradedStocks } from "../../api/stocks";
 import {
+  AlertFields,
   OwnerDetails,
   StockAlert,
   TradedStock,
@@ -15,8 +15,8 @@ import { Accordion, ExpandableRowProps } from "../../components/Accordion";
 import { Button } from "../../components/Button";
 import { GridCell, GridList } from "../../components/GridList";
 import { TrendingNumber } from "../../components/TrendingNumber";
+import { Bell } from "../../components/Bell";
 import { ReactComponent as Plus } from "../../icons/plus.svg";
-import { ReactComponent as AlertIcon } from "../../icons/alert.svg";
 
 import style from "./TradedAssetsPage.module.scss";
 
@@ -45,29 +45,25 @@ const TrendingProfitAndLoss = ({
   />
 );
 
-enum Alert {
-  lowerLimitPrice = "lower_limit_price",
-  upperLimitPrice = "upper_limit_price",
-  dividendDate = "dividend_date",
-  fiscalPriceLowerThan = "fiscal_price_lower_than",
-  fiscalPriceGreaterThan = "fiscal_price_greater_than",
-  profitAndLossLowerThan = "profit_and_loss_lower_limit",
-  profitAndLossGreaterThan = "profit_and_loss_upper_limit",
-}
-
 const AlertMessages = {
-  [Alert.lowerLimitPrice]: (lastPrice: string, limit: string) =>
+  [AlertFields.lowerLimitPrice]: (lastPrice: string, limit: string) =>
     `Last price ${lastPrice} lower than lower limit ${limit}`,
-  [Alert.upperLimitPrice]: (lastPrice: string, limit: string) =>
+  [AlertFields.upperLimitPrice]: (lastPrice: string, limit: string) =>
     `Last price ${lastPrice} greater than upper limit ${limit}`,
-  [Alert.dividendDate]: (date: string) => `Dividend date ${date} has expired`,
-  [Alert.fiscalPriceLowerThan]: () => "Fiscal price is lower than last price",
-  [Alert.fiscalPriceGreaterThan]: () =>
+  [AlertFields.dividendDate]: (date: string) =>
+    `Dividend date ${date} has expired`,
+  [AlertFields.fiscalPriceLowerThan]: () =>
+    "Fiscal price is lower than last price",
+  [AlertFields.fiscalPriceGreaterThan]: () =>
     "Fiscal price is greater than last price",
-  [Alert.profitAndLossLowerThan]: (profitAndLoss: string, limit: string) =>
-    `Profit and loss ${profitAndLoss} lower than lower limit ${limit}`,
-  [Alert.profitAndLossGreaterThan]: (profitAndLoss: string, limit: string) =>
-    `Profit and loss ${profitAndLoss} greater than upper limit ${limit}`,
+  [AlertFields.profitAndLossLowerLimit]: (
+    profitAndLoss: string,
+    limit: string
+  ) => `Profit and loss ${profitAndLoss} lower than lower limit ${limit}`,
+  [AlertFields.profitAndLossUpperLimit]: (
+    profitAndLoss: string,
+    limit: string
+  ) => `Profit and loss ${profitAndLoss} greater than upper limit ${limit}`,
 };
 
 const createAlertMessage = (
@@ -77,28 +73,28 @@ const createAlertMessage = (
   currencyFormatter: Intl.NumberFormat
 ) => {
   switch (triggeredField) {
-    case Alert.lowerLimitPrice:
+    case AlertFields.lowerLimitPrice:
       return AlertMessages[triggeredField](
         currencyFormatter.format(stock.lastPrice),
         currencyFormatter.format(alert.lowerLimitPrice as number)
       );
-    case Alert.upperLimitPrice:
+    case AlertFields.upperLimitPrice:
       return AlertMessages[triggeredField](
         currencyFormatter.format(stock.lastPrice),
         currencyFormatter.format(alert.upperLimitPrice as number)
       );
-    case Alert.dividendDate:
+    case AlertFields.dividendDate:
       return AlertMessages[triggeredField](alert.dividendDate as string);
-    case Alert.fiscalPriceLowerThan:
+    case AlertFields.fiscalPriceLowerThan:
       return AlertMessages[triggeredField]();
-    case Alert.fiscalPriceGreaterThan:
+    case AlertFields.fiscalPriceGreaterThan:
       return AlertMessages[triggeredField]();
-    case Alert.profitAndLossLowerThan:
+    case AlertFields.profitAndLossLowerLimit:
       return AlertMessages[triggeredField](
         currencyFormatter.format(stock.profitAndLoss),
         currencyFormatter.format(alert.profitAndLossLowerLimit as number)
       );
-    case Alert.profitAndLossGreaterThan:
+    case AlertFields.profitAndLossUpperLimit:
       return AlertMessages[triggeredField](
         currencyFormatter.format(stock.profitAndLoss),
         currencyFormatter.format(alert.profitAndLossUpperLimit as number)
@@ -225,11 +221,7 @@ const TradedAssetsPage = ({
               </span>
               {profitAndLoss}
               {alert ? (
-                <AlertIcon
-                  className={classnames(style.Alert, {
-                    [style.TriggeredAlert]: alert.triggeredFields.length > 0,
-                  })}
-                />
+                <Bell warning={alert.triggeredFields.length > 0} />
               ) : (
                 <></>
               )}
@@ -244,8 +236,8 @@ const TradedAssetsPage = ({
                 <section className={style.TriggeredFields}>
                   <span>Triggered Alerts</span>
                   <ul>
-                    {alert.triggeredFields.map((f) => (
-                      <li>
+                    {alert.triggeredFields.map((f, i) => (
+                      <li key={`triggered-field-${i}`}>
                         {createAlertMessage(s, alert, f, nativeFormatter)}
                       </li>
                     ))}

@@ -174,6 +174,16 @@ export interface UpdateStockTransactionPayload {
   transaction_ex_rate: number | null;
 }
 
+export enum AlertFields {
+  lowerLimitPrice = "lower_limit_price",
+  upperLimitPrice = "upper_limit_price",
+  dividendDate = "dividend_date",
+  fiscalPriceLowerThan = "fiscal_price_lower_than",
+  fiscalPriceGreaterThan = "fiscal_price_greater_than",
+  profitAndLossLowerLimit = "profit_and_loss_lower_limit",
+  profitAndLossUpperLimit = "profit_and_loss_upper_limit",
+}
+
 export interface StockAlertResponse {
   stock_id: number;
   owner_id: number;
@@ -185,7 +195,7 @@ export interface StockAlertResponse {
   profit_and_loss_lower_limit: number | null;
   profit_and_loss_upper_limit: number | null;
   stock_alert_id: number;
-  triggered_fields: string[];
+  triggered_fields: AlertFields[];
 }
 
 export interface StockAlertsResponse {
@@ -203,5 +213,28 @@ export interface StockAlert {
   profitAndLossLowerLimit: number | null;
   profitAndLossUpperLimit: number | null;
   stockAlertId: number;
-  triggeredFields: string[];
+  triggeredFields: AlertFields[];
+}
+
+export interface StockAlertCreationPayload {
+  stock_id: number;
+  owner_id: number;
+  lower_limit_price: number | null;
+  upper_limit_price: number | null;
+  dividend_date: string | null;
+  fiscal_price_lower_than: boolean | null;
+  fiscal_price_greater_than: boolean | null;
+  profit_and_loss_lower_limit: number | null;
+  profit_and_loss_upper_limit: number | null;
+}
+
+export interface StockAlertUpdatePayload {
+  stock_alert_id: number;
+  lower_limit_price: number | null;
+  upper_limit_price: number | null;
+  dividend_date: string | null;
+  fiscal_price_lower_than: boolean | null;
+  fiscal_price_greater_than: boolean | null;
+  profit_and_loss_lower_limit: number | null;
+  profit_and_loss_upper_limit: number | null;
 }

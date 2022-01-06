@@ -2,7 +2,7 @@
   .ActionButtons {
     display: flex;
     flex-direction: row;
-    margin-top: 2rem;
+    margin-top: 1rem;
     button {
       display: flex;
       flex-direction: row;
@@ -15,5 +15,63 @@
         width: 1rem;
       }
     }
+  }
+  .SelectedTab {
+    background-color: #7f8c8e;
+    color: white;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+  }
+  .AlertTab {
+    section {
+      margin-top: 1rem;
+    }
+    .NoAlert span {
+      margin-right: 1rem;
+    }
+  }
+  .Tabs {
+    font-size: 1.2rem;
+    font-weight: 400;
+    padding: 0;
+    border-bottom: solid #7f8c8e 1px;
+  }
+}
+
+.AlertForm {
+  display: flex;
+  flex-direction: column;
+  & > * {
+    margin-bottom: 1rem;
+  }
+  input[type="checkbox"] + label {
+    margin-left: 1rem;
+  }
+  .Input {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    input {
+      min-width: 300px;
+    }
+  }
+  .Buttons {
+    margin-top: 1rem;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+  .AlertLabel {
+    display: flex;
+    flex-direction: row;
+    span:first-child {
+      margin-right: 1rem;
+    }
+  }
+  .Checkbox {
+    display: flex;
+    flex-direction: row;
   }
 }

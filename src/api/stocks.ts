@@ -12,6 +12,9 @@ import {
   UpdateStockTransactionPayload,
   StockAlert,
   StockAlertsResponse,
+  StockAlertResponse,
+  StockAlertCreationPayload,
+  StockAlertUpdatePayload,
 } from "./types";
 import { prepareAuthHeader, strictFetch } from "./utils";
 
@@ -55,7 +58,7 @@ export const fetchTradedStock = async (
   ownerID: number,
   stockID: number
 ): Promise<TradedStock> => {
-  const response = await fetch(`/stock/traded/${ownerID}/${stockID}`, {
+  const response = await fetch(`/stock/traded/${ownerID}/${stockID}/`, {
     headers: {
       accept: "application/json",
       ...prepareAuthHeader(token),
@@ -198,6 +201,20 @@ export const updateStocks = async (token: UserToken) => {
   });
 };
 
+const toStockAlert = (a: StockAlertResponse): StockAlert => ({
+  stockId: a.stock_id,
+  ownerId: a.owner_id,
+  lowerLimitPrice: a.lower_limit_price,
+  upperLimitPrice: a.upper_limit_price,
+  dividendDate: a.dividend_date,
+  fiscalPriceLowerThan: a.fiscal_price_lower_than,
+  fiscalPriceGreaterThan: a.fiscal_price_greater_than,
+  profitAndLossLowerLimit: a.profit_and_loss_lower_limit,
+  profitAndLossUpperLimit: a.profit_and_loss_upper_limit,
+  stockAlertId: a.stock_alert_id,
+  triggeredFields: a.triggered_fields,
+});
+
 export const fetchStockAlerts = async (
   token: UserToken,
   ownerID: number
@@ -209,17 +226,66 @@ export const fetchStockAlerts = async (
     },
   });
   const data: StockAlertsResponse = await response.json();
-  return data.alerts.map((a) => ({
-    stockId: a.stock_id,
-    ownerId: a.owner_id,
-    lowerLimitPrice: a.lower_limit_price,
-    upperLimitPrice: a.upper_limit_price,
-    dividendDate: a.dividend_date,
-    fiscalPriceLowerThan: a.fiscal_price_lower_than,
-    fiscalPriceGreaterThan: a.fiscal_price_greater_than,
-    profitAndLossLowerLimit: a.profit_and_loss_lower_limit,
-    profitAndLossUpperLimit: a.profit_and_loss_upper_limit,
-    stockAlertId: a.stock_alert_id,
-    triggeredFields: a.triggered_fields,
-  }));
+  return data.alerts.map((a) => toStockAlert(a));
+};
+
+export const fetchStockAlert = async (
+  token: UserToken,
+  ownerID: number,
+  stockID: number
+): Promise<StockAlert> => {
+  const response = await strictFetch(`/stock/alert/${ownerID}/${stockID}/`, {
+    headers: {
+      accept: "application/json",
+      ...prepareAuthHeader(token),
+    },
+  });
+  const data: StockAlertResponse = await response.json();
+  return toStockAlert(data);
+};
+
+export const createStockAlert = async (
+  token: UserToken,
+  payload: StockAlertCreationPayload
+): Promise<StockAlert> => {
+  const response = await fetch(`/stock/alert/`, {
+    method: "PUT",
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json",
+      ...prepareAuthHeader(token),
+    },
+    body: JSON.stringify(payload),
+  });
+  const data: StockAlertResponse = await response.json();
+  return toStockAlert(data);
+};
+
+export const updateStockAlert = async (
+  token: UserToken,
+  payload: StockAlertUpdatePayload
+): Promise<StockAlert> => {
+  const response = await fetch(`/stock/alert/`, {
+    method: "PATCH",
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json",
+      ...prepareAuthHeader(token),
+    },
+    body: JSON.stringify(payload),
+  });
+  const data: StockAlertResponse = await response.json();
+  return toStockAlert(data);
+};
+
+export const deleteStockAlert = async (token: UserToken, id: number) => {
+  await fetch(`/stock/alert/`, {
+    method: "DELETE",
+    headers: {
+      accept: "application/json",
+      "Content-Type": "application/json",
+      ...prepareAuthHeader(token),
+    },
+    body: JSON.stringify({ stock_alert_id: id }),
+  });
 };

@@ -18,9 +18,13 @@ import {
 import { Button } from "../../components/Button";
 import { GridCell, GridList } from "../../components/GridList";
 import { Input } from "../../components/Input";
-import { datetimeToDate, dateToDatetime, parseDecimal } from "../../utils";
+import { datetimeToDate, dateToDatetime } from "../../utils";
 
 import style from "./AddStockTransactionPage.module.scss";
+import {
+  mustBePositiveInteger,
+  mustBePositiveNumber,
+} from "../../components/Input/Input";
 
 interface AddStockTransactionPageProps {
   authToken: UserToken;
@@ -265,16 +269,7 @@ const AddStockTransactionPage = ({
             label="Price: "
             inputType="text"
             name="price"
-            onChange={(v) => {
-              const num = parseDecimal(v);
-              if (isNaN(num) || num < 0) {
-                setPriceHint("Price must be a positive number");
-                setPrice(null);
-              } else {
-                setPriceHint("");
-                setPrice(num);
-              }
-            }}
+            onChange={mustBePositiveNumber("Price", setPrice, setPriceHint)}
             hint={priceHint}
           />
           <Input
@@ -283,16 +278,11 @@ const AddStockTransactionPage = ({
             label="Exchange Rate: "
             inputType="text"
             name="exchange_rate"
-            onChange={(v) => {
-              const num = parseDecimal(v);
-              if (isNaN(num) || num < 0) {
-                setExRateHint("Exchange rate must be a positive number");
-                setExRate(null);
-              } else {
-                setExRateHint("");
-                setExRate(num);
-              }
-            }}
+            onChange={mustBePositiveNumber(
+              "Exchange rate",
+              setExRate,
+              setExRateHint
+            )}
             hint={exRateHint}
           />
           <Input
@@ -301,21 +291,11 @@ const AddStockTransactionPage = ({
             label="Quantity: "
             inputType="text"
             name="quantity"
-            onChange={(v) => {
-              const num = parseDecimal(v);
-              if (
-                v.indexOf(".") !== -1 ||
-                v.indexOf(",") !== -1 ||
-                isNaN(num) ||
-                num < 0
-              ) {
-                setQuantityHint("Quantity must be a positive integer");
-                setQuantity(null);
-              } else {
-                setQuantityHint("");
-                setQuantity(num);
-              }
-            }}
+            onChange={mustBePositiveInteger(
+              "Quantity",
+              setQuantity,
+              setQuantityHint
+            )}
             hint={quantityHint}
           />
           <Input
@@ -324,16 +304,7 @@ const AddStockTransactionPage = ({
             label="Tax: "
             inputType="text"
             name="tax"
-            onChange={(v) => {
-              const num = parseDecimal(v);
-              if (isNaN(num) || num < 0) {
-                setTaxHint("Tax must be a positive number");
-                setTax(null);
-              } else {
-                setTaxHint("");
-                setTax(num);
-              }
-            }}
+            onChange={mustBePositiveNumber("Tax", setTax, setTaxHint)}
             hint={taxHint}
           />
           <Input
@@ -342,16 +313,11 @@ const AddStockTransactionPage = ({
             label="Commission: "
             inputType="text"
             name="commission"
-            onChange={(v) => {
-              const num = parseDecimal(v);
-              if (isNaN(num) || num < 0) {
-                setCommissionHint("Commission must be a positive number");
-                setCommission(null);
-              } else {
-                setCommissionHint("");
-                setCommission(num);
-              }
-            }}
+            onChange={mustBePositiveNumber(
+              "Commission",
+              setCommission,
+              setCommissionHint
+            )}
             hint={commissionHint}
           />
           <Input
