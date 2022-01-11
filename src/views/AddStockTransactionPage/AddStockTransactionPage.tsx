@@ -24,6 +24,7 @@ import style from "./AddStockTransactionPage.module.scss";
 import {
   mustBePositiveInteger,
   mustBePositiveNumber,
+  mustBeZeroOrPositiveNumber,
 } from "../../components/Input/Input";
 
 interface AddStockTransactionPageProps {
@@ -144,8 +145,6 @@ const AddStockTransactionPage = ({
     return (
       price === null ||
       quantity === null ||
-      tax === null ||
-      commission === null ||
       date === null ||
       date === "" ||
       (transactionType === null && action === Actions.ADD) ||
@@ -156,14 +155,12 @@ const AddStockTransactionPage = ({
       exRateHint !== ""
     );
   }, [
-    commission,
     commissionHint,
     date,
     price,
     priceHint,
     quantity,
     quantityHint,
-    tax,
     taxHint,
     transactionType,
     exRateHint,
@@ -177,8 +174,6 @@ const AddStockTransactionPage = ({
             if (
               price !== null &&
               quantity !== null &&
-              tax !== null &&
-              commission !== null &&
               date !== null &&
               transactionType !== null
             ) {
@@ -186,8 +181,8 @@ const AddStockTransactionPage = ({
                 stock_id: (stock as Stock).stockId,
                 price,
                 quantity,
-                tax,
-                commission,
+                tax: tax || 0,
+                commission: commission || 0,
                 date: dateToDatetime(date),
                 transaction_type: transactionType,
                 transaction_note: note,
@@ -204,16 +199,14 @@ const AddStockTransactionPage = ({
               state.transaction &&
               price !== null &&
               quantity !== null &&
-              tax !== null &&
-              commission !== null &&
               date !== null
             ) {
               await modifyStockTransaction(authToken, {
                 stock_transaction_id: state.transaction.stockTransactionId,
                 price,
                 quantity,
-                tax,
-                commission,
+                tax: tax || 0,
+                commission: commission || 0,
                 date: dateToDatetime(date),
                 transaction_note: note,
                 transaction_ex_rate: exRate,
@@ -304,7 +297,7 @@ const AddStockTransactionPage = ({
             label="Tax: "
             inputType="text"
             name="tax"
-            onChange={mustBePositiveNumber("Tax", setTax, setTaxHint)}
+            onChange={mustBeZeroOrPositiveNumber("Tax", setTax, setTaxHint, true)}
             hint={taxHint}
           />
           <Input
@@ -313,10 +306,11 @@ const AddStockTransactionPage = ({
             label="Commission: "
             inputType="text"
             name="commission"
-            onChange={mustBePositiveNumber(
+            onChange={mustBeZeroOrPositiveNumber(
               "Commission",
               setCommission,
-              setCommissionHint
+              setCommissionHint,
+              true
             )}
             hint={commissionHint}
           />

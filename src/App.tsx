@@ -1,11 +1,10 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { useHistory } from "react-router";
 import { Switch, Route } from "react-router-dom";
 import ClipLoader from "react-spinners/ClipLoader";
 
 import { authenticateUser, fetchUser } from "./api/user";
-import { fetchAccounts } from "./api/account";
-import { BankAccount, User, UserToken } from "./api/types";
+import { User, UserToken } from "./api/types";
 import { DefaultLayout } from "./components/DefaultLayout";
 
 const IndexPage = lazy(() => import("./views/IndexPage/IndexPage"));
@@ -25,7 +24,6 @@ const StockTransactionHistoryPage = lazy(
 function App() {
   const [authToken, setAuthToken] = useState<UserToken | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [accounts, setAccount] = useState<BankAccount[] | null>(null);
   const [failedAuth, setFailedAuth] = useState<boolean>(false);
 
   const history = useHistory();
@@ -34,26 +32,10 @@ function App() {
     if (authToken) {
       void (async () => {
         setUser(await fetchUser(authToken));
-        setAccount(await fetchAccounts(authToken));
         history.push("/");
       })();
     } else history.push("/login");
   }, [authToken, history]);
-
-  const index = useMemo(
-    () =>
-      authToken && accounts && user ? (
-        <IndexPage
-          accounts={accounts}
-          authToken={authToken}
-          baseCurrency={user.baseCurrency}
-          onUpdateStock={async () => setAccount(await fetchAccounts(authToken))}
-        />
-      ) : (
-        <></>
-      ),
-    [accounts, user, authToken]
-  );
 
   return (
     <Switch>
@@ -66,7 +48,16 @@ function App() {
           }
         >
           <Route exact path="/">
-            {index}
+            {
+              authToken && user ? (
+                <IndexPage
+                  authToken={authToken}
+                  baseCurrency={user.baseCurrency}
+                />
+              ) : (
+                <></>
+              )
+            }
           </Route>
           <Route exact path="/login">
             <LoginPage

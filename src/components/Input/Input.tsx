@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { parseDecimal } from "../../utils";
 import style from "./Input.module.scss";
 
+type ValueSetter = (v: React.SetStateAction<number | null>) => void
+type HintSetter = (v: React.SetStateAction<string>) => void
+
 interface InputProps {
   inputType: string;
   name: string;
@@ -19,8 +22,8 @@ interface InputProps {
 const validateNumber =
   (
     hint: string,
-    setValue: (v: React.SetStateAction<number | null>) => void,
-    setHint: (v: React.SetStateAction<string>) => void,
+    setValue: ValueSetter,
+    setHint: HintSetter,
     setNullWhenEmpty?: boolean,
     additionalValidation?: (rawValue: string, value: number) => boolean
   ) =>
@@ -42,8 +45,8 @@ const validateNumber =
 
 export const mustBeNumber = (
   fieldName: string,
-  setValue: (v: React.SetStateAction<number | null>) => void,
-  setHint: (v: React.SetStateAction<string>) => void,
+  setValue: ValueSetter,
+  setHint: HintSetter,
   setNullWhenEmpty?: boolean
 ) =>
   validateNumber(
@@ -55,8 +58,8 @@ export const mustBeNumber = (
 
 export const mustBePositiveNumber = (
   fieldName: string,
-  setValue: (v: React.SetStateAction<number | null>) => void,
-  setHint: (v: React.SetStateAction<string>) => void,
+  setValue: ValueSetter,
+  setHint: HintSetter,
   setNullWhenEmpty?: boolean
 ) =>
   validateNumber(
@@ -67,10 +70,24 @@ export const mustBePositiveNumber = (
     (_, value) => value > 0
   );
 
+export const mustBeZeroOrPositiveNumber = (
+  fieldName: string,
+  setValue: ValueSetter,
+  setHint: HintSetter,
+  setNullWhenEmpty?: boolean
+) =>
+  validateNumber(
+    `${fieldName} must be a positive number or zero`,
+    setValue,
+    setHint,
+    setNullWhenEmpty,
+    (_, value) => value >= 0
+  );
+
 export const mustBePositiveInteger = (
   fieldName: string,
-  setValue: (v: React.SetStateAction<number | null>) => void,
-  setHint: (v: React.SetStateAction<string>) => void,
+  setValue: ValueSetter,
+  setHint: HintSetter,
   setNullWhenEmpty?: boolean
 ) =>
   validateNumber(

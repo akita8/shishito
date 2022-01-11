@@ -1,24 +1,33 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useHistory } from "react-router";
 import ClipLoader from "react-spinners/ClipLoader";
+import { fetchAccounts } from "../../api/account";
 
 import { updateStocks } from "../../api/stocks";
 import { BankAccount, UserToken } from "../../api/types";
+import { Bell } from "../../components/Bell";
 import { Button } from "../../components/Button";
 import { Card } from "../../components/Card";
 
 import style from "./IndexPage.module.scss";
 
 interface IndexPageProps {
-  accounts: BankAccount[];
   authToken: UserToken;
   baseCurrency: string;
-  onUpdateStock: () => void
 }
 
-const IndexPage = ({ accounts, authToken, baseCurrency, onUpdateStock }: IndexPageProps) => {
+const IndexPage = ({ authToken, baseCurrency }: IndexPageProps) => {
   const history = useHistory();
   const [updatingStocks, setUpdatingStocks] = useState(false);
+  const [accounts, setAccount] = useState<BankAccount[] | null>(null);
+
+  useEffect(() => {
+    if (authToken) {
+      void (async () => {
+        setAccount(await fetchAccounts(authToken))
+      })();
+    }
+  }, [authToken])
 
   const currencyFormatter = useMemo(
     () =>
@@ -39,7 +48,7 @@ const IndexPage = ({ accounts, authToken, baseCurrency, onUpdateStock }: IndexPa
             onClick={async () => {
               setUpdatingStocks(true);
               await updateStocks(authToken);
-              onUpdateStock()
+              setAccount(await fetchAccounts(authToken))
               setUpdatingStocks(false);
             }}
           >
@@ -48,7 +57,7 @@ const IndexPage = ({ accounts, authToken, baseCurrency, onUpdateStock }: IndexPa
         )}
       </div>
       <div className={style.Accounts}>
-        {accounts.map((a) => (
+        {accounts ? accounts.map((a) => (
           <Card key={a.accountId} className={style.Card}>
             <header>
               <span className={style.Bank}>{a.bankName}</span>
@@ -59,16 +68,22 @@ const IndexPage = ({ accounts, authToken, baseCurrency, onUpdateStock }: IndexPa
             </header>
             <div className={style.Buttons}>
               {a.owners.map((o) => (
-                <Button
-                  key={o.ownerId}
-                  onClick={() => history.push(`/traded/${o.ownerId}`)}
-                >
-                  {o.name}
-                </Button>
+                <span>
+                  {
+                    o.hasTriggeredAlerts &&
+                    <Bell warning /> 
+                  }
+                  <Button
+                    key={o.ownerId}
+                    onClick={() => history.push(`/traded/${o.ownerId}`)}
+                  >
+                    {o.name}
+                  </Button>
+                </span>
               ))}
             </div>
           </Card>
-        ))}
+        )): <></>}
       </div>
     </div>
   );

@@ -41,6 +41,9 @@
         button:not(:first-child) {
           margin-top: 0.2rem;
         }
+        span button{
+          margin-left: 1rem;
+        }
       }
     }
   }

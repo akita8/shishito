@@ -30,6 +30,7 @@ export interface AccountsResponse {
     owners: {
       name: string;
       owner_id: number;
+      has_triggered_alerts?: boolean;
     }[];
   }[];
 }
@@ -37,6 +38,7 @@ export interface AccountsResponse {
 export interface Owner {
   name: string;
   ownerId: number;
+  hasTriggeredAlerts?: boolean;
 }
 
 export interface BankAccount {
